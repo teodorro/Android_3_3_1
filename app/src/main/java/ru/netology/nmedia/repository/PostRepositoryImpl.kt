@@ -2,6 +2,7 @@ package ru.netology.nmedia.repository
 
 import androidx.lifecycle.*
 import okio.IOException
+import retrofit2.Response
 import ru.netology.nmedia.api.*
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Post
@@ -64,7 +65,14 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun likeById(id: Long) {
         try {
-            val response = PostsApi.service.likeById(id)
+            val postResponse = PostsApi.service.getById(id)
+            val postBody = postResponse.body() ?: throw ApiError(postResponse.code(), postResponse.message())
+
+            val response : Response<Post> = if (!postBody.likedByMe) {
+                PostsApi.service.likeById(id)
+            } else {
+                PostsApi.service.dislikeById(id)
+            }
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
