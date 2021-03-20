@@ -1,6 +1,7 @@
 package ru.netology.nmedia.entity
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import ru.netology.nmedia.dto.Post
 
@@ -14,6 +15,7 @@ data class PostEntity(
     val published: String,
     val likedByMe: Boolean,
     val likes: Int = 0,
+    val wasSeen: Boolean = false,
 ) {
     fun toDto() = Post(id, author, authorAvatar, content, published, likedByMe, likes)
 

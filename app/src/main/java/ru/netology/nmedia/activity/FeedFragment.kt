@@ -9,6 +9,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
@@ -16,6 +19,7 @@ import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.viewmodel.PostViewModel
+
 
 class FeedFragment : Fragment() {
 
@@ -70,10 +74,26 @@ class FeedFragment : Fragment() {
 
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()
+            viewModel.updateWasSeen()
         }
 
         binding.fab.setOnClickListener {
             findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+        }
+
+        binding.fabNewPosts.setOnClickListener {
+            viewModel.updateWasSeen()
+            binding.fabNewPosts.isVisible = false
+
+            var lm = binding.list.layoutManager
+            lm?.smoothScrollToPosition(binding.list, RecyclerView.State(), 1) // если изначально было на нуле, то без этой штуки не сдвинется
+            lm?.smoothScrollToPosition(binding.list, RecyclerView.State(), 0)
+        }
+
+        viewModel.newerCount.observe(viewLifecycleOwner) {
+            println("------------------------------------------")
+            println(it)
+            binding.fabNewPosts.isVisible = it > 0
         }
 
         return binding.root
