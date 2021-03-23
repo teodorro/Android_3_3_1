@@ -65,6 +65,7 @@ dependencies {
     def retrofitgson_version = "2.9.0"
     def okhttplogging_version = "4.9.0"
     def coroutines_version = "1.4.2"
+    def imagepicker_version = "1.8"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -92,6 +93,8 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttplogging_version"
     implementation "com.github.bumptech.glide:glide:$glide_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+    implementation "com.github.dhaval2404:imagepicker:$imagepicker_version"
+    implementation "com.github.yalantis:ucrop:2.2.6"
 
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "androidx.test.ext:junit:$ext_junit_version"
