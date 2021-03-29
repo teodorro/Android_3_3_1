@@ -83,12 +83,31 @@
             app:layout_constraintTop_toBottomOf="@id/header"
             tools:text="@sample/posts.json/data/content" />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constrLayoutAttachment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/content">
+
+        <ImageView
+            android:id="@+id/imageViewAttachment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/footer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="content" />
+            app:constraint_referenced_ids="constrLayoutAttachment" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/like"
