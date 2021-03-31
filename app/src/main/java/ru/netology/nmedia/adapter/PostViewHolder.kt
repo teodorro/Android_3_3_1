@@ -60,6 +60,9 @@ class PostViewHolder(
                     .error(R.drawable.ic_baseline_error_24)
                     .timeout(10_000)
                     .into(binding.imageViewAttachment)
+                imageViewAttachment.setOnClickListener {
+                    onInteractionListener.onShowPicAttachment(post)
+                }
             }
         }
     }

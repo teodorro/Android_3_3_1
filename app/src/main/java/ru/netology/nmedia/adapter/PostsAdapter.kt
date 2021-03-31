@@ -11,6 +11,7 @@ interface OnInteractionListener {
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
+    fun onShowPicAttachment(post: Post) {}
 }
 
 class PostsAdapter(

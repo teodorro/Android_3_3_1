@@ -26,4 +26,8 @@
     <string name="description_select_photo">Select photo</string>
     <string name="description_photo">Photo</string>
     <string name="remove">Remove</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

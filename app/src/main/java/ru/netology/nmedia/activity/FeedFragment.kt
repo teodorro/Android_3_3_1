@@ -56,6 +56,10 @@ class FeedFragment : Fragment() {
                     Intent.createChooser(intent, getString(R.string.chooser_share_post))
                 startActivity(shareIntent)
             }
+
+            override fun onShowPicAttachment(post: Post) {
+                findNavController().navigate(R.id.action_feedFragment_to_picFragment)
+            }
         })
         binding.list.adapter = adapter
         viewModel.dataState.observe(viewLifecycleOwner, { state ->
