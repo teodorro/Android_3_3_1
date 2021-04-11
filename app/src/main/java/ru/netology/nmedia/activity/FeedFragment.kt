@@ -58,6 +58,7 @@ class FeedFragment : Fragment() {
             }
 
             override fun onShowPicAttachment(post: Post) {
+                viewModel.selectedPost.value = post
                 findNavController().navigate(R.id.action_feedFragment_to_picFragment)
             }
         })

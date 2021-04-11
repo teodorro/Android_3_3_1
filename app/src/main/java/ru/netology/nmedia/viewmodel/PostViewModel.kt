@@ -57,6 +57,9 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val photo: LiveData<PhotoModel>
         get() = _photo
 
+    val selectedPost = MutableLiveData(empty)
+
+
     init {
         loadPosts()
     }
