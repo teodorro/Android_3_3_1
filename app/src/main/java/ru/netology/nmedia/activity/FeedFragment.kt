@@ -58,7 +58,8 @@ class FeedFragment : Fragment() {
             }
 
             override fun onShowPicAttachment(post: Post) {
-                viewModel.selectedPost.value = post
+//                viewModel.selectedPost.value = post
+                viewModel.selectedId = post.id
                 findNavController().navigate(R.id.action_feedFragment_to_picFragment)
             }
         })
@@ -75,6 +76,8 @@ class FeedFragment : Fragment() {
         viewModel.data.observe(viewLifecycleOwner, { state ->
             adapter.submitList(state.posts)
             binding.emptyText.isVisible = state.empty
+//            if (viewModel.selectedPost.value?.id != 0L)
+//                viewModel.selectedPost.value = state.posts.first { x -> x.id == viewModel.selectedPost.value?.id}
         })
 
         binding.swiperefresh.setOnRefreshListener {

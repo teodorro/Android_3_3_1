@@ -7,6 +7,7 @@ import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentPicBinding
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
@@ -58,8 +59,6 @@ class PicFragment: Fragment() {
         )
         fragmentBinding = binding
 
-//        arguments?.textArg
-//            ?.let(binding.edit::setText)
 
         viewModel.selectedPost.observe(viewLifecycleOwner){
             val post = it
@@ -72,7 +71,20 @@ class PicFragment: Fragment() {
                     .timeout(10_000)
                     .into(binding.picViewAttachment)
                 }
+
+            binding.like.text = post.likes.toString()
+            binding.like.isChecked = post.likedByMe
             }
+
+        binding.like.setOnClickListener{
+            if (viewModel.selectedPost.value != null){
+                var post: Post = viewModel.selectedPost.value!!
+                viewModel.likeById(post.id)
+                //post.id?.let { postId -> viewModel.likeById(postId) }
+//                binding.like.isChecked = post.likedByMe
+//                binding.like.text = "${post.likes}"
+            }
+        }
 
         return binding.root
     }
