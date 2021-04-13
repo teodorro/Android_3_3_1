@@ -62,7 +62,7 @@ class PicFragment: Fragment() {
 
         viewModel.selectedPost.observe(viewLifecycleOwner) {
             val post = it
-            if (post != null) {
+            if (post != null) { // но отчего-то он не null только при переходе на фрагмент
                 if (post.attachment != null) {
                     val urlAttachment = "http://10.0.2.2:9999/media/${post.attachment.url}"
                     Glide.with(binding.picViewAttachment)
@@ -72,7 +72,6 @@ class PicFragment: Fragment() {
                         .timeout(10_000)
                         .into(binding.picViewAttachment)
                 }
-
                 binding.like.text = post.likes.toString()
                 binding.like.isChecked = post.likedByMe
             }
@@ -82,9 +81,9 @@ class PicFragment: Fragment() {
             if (viewModel.selectedPost.value != null){
                 var post: Post = viewModel.selectedPost.value!!
                 viewModel.likeById(post.id)
-                //post.id?.let { postId -> viewModel.likeById(postId) }
-//                binding.like.isChecked = post.likedByMe
-//                binding.like.text = "${post.likes}"
+                // из-за того, что post не null только при переходе на фрагмент
+                var likes = post.likes + (if (binding.like.isChecked) 1 else 0)
+                binding.like.text = "$likes"
             }
         }
 
