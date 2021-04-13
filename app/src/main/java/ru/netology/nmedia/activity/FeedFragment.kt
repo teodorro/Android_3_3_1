@@ -23,6 +23,7 @@ import ru.netology.nmedia.viewmodel.PostViewModel
 
 class FeedFragment : Fragment() {
 
+    private var newPostsWasPressed: Boolean = false
     private val viewModel: PostViewModel by viewModels(ownerProducer = ::requireParentFragment)
 
     override fun onCreateView(
@@ -73,12 +74,16 @@ class FeedFragment : Fragment() {
                     .show()
             }
         })
-        viewModel.data.observe(viewLifecycleOwner, { state ->
+        viewModel.data.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state.posts)
             binding.emptyText.isVisible = state.empty
-//            if (viewModel.selectedPost.value?.id != 0L)
-//                viewModel.selectedPost.value = state.posts.first { x -> x.id == viewModel.selectedPost.value?.id}
-        })
+
+            if (newPostsWasPressed){
+                var lm = binding.list.layoutManager
+                lm?.smoothScrollToPosition(binding.list, RecyclerView.State(), 0)
+                newPostsWasPressed = false
+            }
+        }
 
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()
@@ -92,10 +97,7 @@ class FeedFragment : Fragment() {
         binding.fabNewPosts.setOnClickListener {
             viewModel.updateWasSeen()
             binding.fabNewPosts.isVisible = false
-
-            var lm = binding.list.layoutManager
-            lm?.smoothScrollToPosition(binding.list, RecyclerView.State(), 1) // если изначально было на нуле, то без этой штуки не сдвинется
-            lm?.smoothScrollToPosition(binding.list, RecyclerView.State(), 0)
+            newPostsWasPressed = true
         }
 
         viewModel.newerCount.observe(viewLifecycleOwner) {

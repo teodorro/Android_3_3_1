@@ -27,7 +27,7 @@ import ru.netology.nmedia.error.UnknownError
 class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
     override val data = dao.getAll()
         .map(List<PostEntity>::toDto)
-        .flowOn(Dispatchers.Default);
+        .flowOn(Dispatchers.Default)
 
     override fun getNewerCount(id: Long): Flow<Int> = flow {
         while (true) {

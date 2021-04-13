@@ -23,6 +23,7 @@ class PicFragment: Fragment() {
     )
 
     private var fragmentBinding: FragmentPicBinding? = null
+    private var likesTmp: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +84,11 @@ class PicFragment: Fragment() {
                 viewModel.likeById(post.id)
                 // из-за того, что post не null только при переходе на фрагмент
                 var likes = post.likes + (if (binding.like.isChecked) 1 else 0)
+                binding.like.text = "$likes"
+                likesTmp = likes
+            }
+            else{
+                var likes = likesTmp + (if (binding.like.isChecked) 1 else 0)
                 binding.like.text = "$likes"
             }
         }
