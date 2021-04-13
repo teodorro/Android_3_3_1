@@ -60,21 +60,23 @@ class PicFragment: Fragment() {
         fragmentBinding = binding
 
 
-        viewModel.selectedPost.observe(viewLifecycleOwner){
+        viewModel.selectedPost.observe(viewLifecycleOwner) {
             val post = it
-            if (post.attachment != null) {
-                val urlAttachment = "http://10.0.2.2:9999/media/${post.attachment.url}"
-                Glide.with(binding.picViewAttachment)
-                    .load(urlAttachment)
-                    .placeholder(R.drawable.common_full_open_on_phone)
-                    .error(R.drawable.ic_baseline_error_24)
-                    .timeout(10_000)
-                    .into(binding.picViewAttachment)
+            if (post != null) {
+                if (post.attachment != null) {
+                    val urlAttachment = "http://10.0.2.2:9999/media/${post.attachment.url}"
+                    Glide.with(binding.picViewAttachment)
+                        .load(urlAttachment)
+                        .placeholder(R.drawable.common_full_open_on_phone)
+                        .error(R.drawable.ic_baseline_error_24)
+                        .timeout(10_000)
+                        .into(binding.picViewAttachment)
                 }
 
-            binding.like.text = post.likes.toString()
-            binding.like.isChecked = post.likedByMe
+                binding.like.text = post.likes.toString()
+                binding.like.isChecked = post.likedByMe
             }
+        }
 
         binding.like.setOnClickListener{
             if (viewModel.selectedPost.value != null){
