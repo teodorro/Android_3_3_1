@@ -38,7 +38,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(body.toEntity())
+            dao.insert(body.toEntity(false))
             emit(body.size)
         }
     }.catch { e -> throw AppError.from(e) }
@@ -46,13 +46,15 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun getAll() {
         try {
+            // получить все посты с сервера
             val response = PostsApi.service.getAll()
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
 
+            // обновить базу. Новые добавить, несовпадающие заменить.
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(body.toEntity())
+            dao.insert(body.toEntity(false))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -68,7 +70,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             }
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body))
+            dao.insert(PostEntity.fromDto(body, true)) //TODO: wasSeen == false
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -107,7 +109,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             }
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body))
+            dao.insert(PostEntity.fromDto(body, true)) //TODO: wasSeen = false
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {

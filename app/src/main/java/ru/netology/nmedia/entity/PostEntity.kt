@@ -6,6 +6,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.entity.PostEntity.Companion.fromDto
 import ru.netology.nmedia.enumeration.AttachmentType
 
 @Entity
@@ -24,9 +25,10 @@ data class PostEntity(
 ) {
     fun toDto() = Post(id, author, authorAvatar, content, published, likedByMe, likes, attachment?.toDto())
 
+    // wasSeen всегда false
     companion object {
-        fun fromDto(dto: Post) =
-            PostEntity(dto.id, dto.author, dto.authorAvatar, dto.content, dto.published, dto.likedByMe, dto.likes, false, AttachmentEmbeddable.fromDto(dto.attachment))
+        fun fromDto(dto: Post, wasSeen: Boolean) =
+            PostEntity(dto.id, dto.author, dto.authorAvatar, dto.content, dto.published, dto.likedByMe, dto.likes, wasSeen, AttachmentEmbeddable.fromDto(dto.attachment))
 
     }
 }
@@ -44,5 +46,14 @@ data class AttachmentEmbeddable(
     }
 }
 
+// extension methods?
 fun List<PostEntity>.toDto(): List<Post> = map(PostEntity::toDto)
-fun List<Post>.toEntity(): List<PostEntity> = map(PostEntity::fromDto)
+//fun List<Post>.toEntity(wasSeen: Boolean): List<PostEntity> = map(PostEntity::fromDto)
+fun List<Post>.toEntity(wasSeen: Boolean): List<PostEntity> {
+    var postEntities = mutableListOf<PostEntity>()
+    for (post in this){
+        postEntities.add(fromDto(post, wasSeen))
+    }
+    return postEntities
+}
+
