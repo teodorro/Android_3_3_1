@@ -46,7 +46,6 @@
             android:contentDescription="@string/description_post_like"
             app:icon="@drawable/ic_like_white_24dp"
             android:textColor="#999999"
-            app:iconTint="#999999"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/footer"
             tools:checked="@sample/posts.json/data/likedByMe"
@@ -59,8 +58,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/common_spacing"
             android:contentDescription="@string/description_post_share"
-            android:textColor="#999999"
-            app:iconTint="#999999"
             app:icon="@drawable/ic_share_24"
             app:layout_constraintStart_toEndOf="@+id/like"
             app:layout_constraintTop_toBottomOf="@id/footer" />
