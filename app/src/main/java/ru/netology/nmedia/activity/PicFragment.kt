@@ -2,8 +2,10 @@ package ru.netology.nmedia.activity
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentPicBinding
@@ -12,7 +14,7 @@ import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
 
-class PicFragment: Fragment() {
+class PicFragment : Fragment() {
 
     companion object {
         var Bundle.textArg: String? by StringArg
@@ -23,7 +25,7 @@ class PicFragment: Fragment() {
     )
 
     private var fragmentBinding: FragmentPicBinding? = null
-    private var likesTmp: Int = 0
+    private var idOnScreen: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +40,6 @@ class PicFragment: Fragment() {
         return when (item.itemId) {
             R.id.save -> {
                 fragmentBinding?.let {
-//                    viewModel.changeContent(it.edit.text.toString())
                     viewModel.save()
                     AndroidUtils.hideKeyboard(requireView())
                 }
@@ -60,36 +61,32 @@ class PicFragment: Fragment() {
         )
         fragmentBinding = binding
 
-
-        viewModel.selectedPost.observe(viewLifecycleOwner) {
-            val post = it
-            if (post != null) { // но отчего-то он не null только при переходе на фрагмент
-                if (post.attachment != null) {
-                    val urlAttachment = "http://10.0.2.2:9999/media/${post.attachment.url}"
-                    Glide.with(binding.picViewAttachment)
-                        .load(urlAttachment)
-                        .placeholder(R.drawable.common_full_open_on_phone)
-                        .error(R.drawable.ic_baseline_error_24)
-                        .timeout(10_000)
-                        .into(binding.picViewAttachment)
+        viewModel.data.observe(viewLifecycleOwner) { state ->
+            val post = viewModel.data.value!!.posts.firstOrNull { x -> x.id == viewModel.selectedId }
+            if (post != null) {
+                if (post.id != idOnScreen) {
+                    idOnScreen = post.id
+                    if (post.attachment != null) {
+                        val urlAttachment = "http://10.0.2.2:9999/media/${post.attachment.url}"
+                        Glide.with(binding.picViewAttachment)
+                            .load(urlAttachment)
+                            .placeholder(R.drawable.common_full_open_on_phone)
+                            .error(R.drawable.ic_baseline_error_24)
+                            .timeout(10_000)
+                            .into(binding.picViewAttachment)
+                    }
                 }
                 binding.like.text = post.likes.toString()
                 binding.like.isChecked = post.likedByMe
             }
         }
 
-        binding.like.setOnClickListener{
-            if (viewModel.selectedPost.value != null){
-                var post: Post = viewModel.selectedPost.value!!
+        binding.like.setOnClickListener {
+            binding.like.isChecked = !binding.like.isChecked
+            val post =
+                viewModel.data.value!!.posts.firstOrNull { x -> x.id == viewModel.selectedId }
+            if (post != null) {
                 viewModel.likeById(post.id)
-                // из-за того, что post не null только при переходе на фрагмент
-                var likes = post.likes + (if (binding.like.isChecked) 1 else 0)
-                binding.like.text = "$likes"
-                likesTmp = likes
-            }
-            else{
-                var likes = likesTmp + (if (binding.like.isChecked) 1 else 0)
-                binding.like.text = "$likes"
             }
         }
 

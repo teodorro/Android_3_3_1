@@ -59,12 +59,12 @@ class FeedFragment : Fragment() {
             }
 
             override fun onShowPicAttachment(post: Post) {
-//                viewModel.selectedPost.value = post
                 viewModel.selectedId = post.id
                 findNavController().navigate(R.id.action_feedFragment_to_picFragment)
             }
         })
-        binding.list.adapter = adapter
+        binding.recyclerView.adapter = adapter
+
         viewModel.dataState.observe(viewLifecycleOwner, { state ->
             binding.progress.isVisible = state.loading
             binding.swiperefresh.isRefreshing = state.refreshing
@@ -74,13 +74,15 @@ class FeedFragment : Fragment() {
                     .show()
             }
         })
+
         viewModel.data.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state.posts)
             binding.emptyText.isVisible = state.empty
 
             if (newPostsWasPressed){
-                var lm = binding.list.layoutManager
-                lm?.smoothScrollToPosition(binding.list, RecyclerView.State(), 0)
+                var lm = binding.recyclerView.layoutManager
+                var lmc = lm?.itemCount
+                lm?.smoothScrollToPosition(binding.recyclerView, RecyclerView.State(), 0)
                 newPostsWasPressed = false
             }
         }

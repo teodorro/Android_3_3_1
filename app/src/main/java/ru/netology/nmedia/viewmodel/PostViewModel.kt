@@ -58,10 +58,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         get() = _photo
 
     var selectedId = 0L
-    val selectedPost: LiveData<Post> = Transformations.map(data){
-        x -> x.posts.firstOrNull{p -> p.id == selectedId}
-    }
-//    val selectedPost = MutableLiveData(empty)
 
 
     init {
