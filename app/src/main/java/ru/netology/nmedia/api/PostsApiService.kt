@@ -12,6 +12,7 @@ import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.auth.AuthState
 
 private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
 
@@ -75,6 +76,13 @@ interface PostsApiService {
     @Multipart
     @POST("media")
     suspend fun upload(@Part media: MultipartBody.Part): Response<Media>
+
+    @POST("/api/users/authentication")
+    @FormUrlEncoded
+    suspend fun signIn(
+        @Field("login") login: String,
+        @Field("pass") pass: String
+    ): Response<AuthState>
 }
 
 object PostsApi {

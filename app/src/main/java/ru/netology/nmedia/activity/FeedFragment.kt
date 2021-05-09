@@ -76,15 +76,14 @@ class FeedFragment : Fragment() {
         })
 
         viewModel.data.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state.posts)
-            binding.emptyText.isVisible = state.empty
-
-            if (newPostsWasPressed){
-                var lm = binding.recyclerView.layoutManager
-                var lmc = lm?.itemCount
-                lm?.smoothScrollToPosition(binding.recyclerView, RecyclerView.State(), 0)
-                newPostsWasPressed = false
+            adapter.submitList(state.posts) {
+                if (newPostsWasPressed) {
+                    val lm = binding.recyclerView.layoutManager
+                    lm?.smoothScrollToPosition(binding.recyclerView, RecyclerView.State(), 0)
+                    newPostsWasPressed = false
+                }
             }
+            binding.emptyText.isVisible = state.empty
         }
 
         binding.swiperefresh.setOnRefreshListener {

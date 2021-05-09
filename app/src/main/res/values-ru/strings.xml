@@ -34,4 +34,6 @@
     <string name="sign_out">Выйти</string>
     <string name="login">Логин</string>
     <string name="login2">Войти</string>
+    <string name="errorLoginPassword">Неверный логин или пароль. Или другая ошибка</string>
+    <string name="enterLoginPassword">Введите логин и пароль</string>
 </resources>

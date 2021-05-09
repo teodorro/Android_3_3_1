@@ -75,8 +75,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     var selectedId = 0L
 
-    var authenticated: Boolean = false
-
 
     init {
         loadPosts()

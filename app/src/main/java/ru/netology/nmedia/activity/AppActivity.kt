@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.iid.FirebaseInstanceId
@@ -54,10 +55,10 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-
+        var authenticated = AppAuth.getInstance().authStateFlow.value.id != 0L
         menu?.let{
-            it.setGroupVisible(R.id.unauthenticated, !viewModel.authenticated)
-            it.setGroupVisible(R.id.authenticated, viewModel.authenticated)
+            it.setGroupVisible(R.id.unauthenticated, !authenticated)
+            it.setGroupVisible(R.id.authenticated, authenticated)
         }
         return true
     }
@@ -65,18 +66,14 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId){
             R.id.signin -> {
-                // TODO: substitute hardcode with implementation
-                AppAuth.getInstance().setAuth(5, "x-token")
+                findNavController(R.id.nav_host_fragment).navigate(R.id.action_feedFragment_to_signInFragment)
                 true
             }
             R.id.signup -> {
-                // TODO: substitute hardcode with implementation
-                AppAuth.getInstance().setAuth(5, "x-token")
                 true
             }
             R.id.signout -> {
-                // TODO: substitute hardcode with implementation
-                AppAuth.getInstance().setAuth(5, "x-token")
+                AppAuth.getInstance().removeAuth()
                 true
             }
             else -> super.onOptionsItemSelected(item)
