@@ -74,6 +74,8 @@ dependencies {
     def okhttplogging_version = "4.9.0"
     def coroutines_version = "1.4.2"
     def imagepicker_version = "1.8"
+    def yalantis_version = "2.2.6"
+    def workmanager_version = "2.5.0"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -102,7 +104,8 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:$glide_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     implementation "com.github.dhaval2404:imagepicker:$imagepicker_version"
-    implementation "com.github.yalantis:ucrop:2.2.6"
+    implementation "com.github.yalantis:ucrop:$yalantis_version"
+    implementation "androidx.work:work-runtime-ktx:$workmanager_version"
 
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "androidx.test.ext:junit:$ext_junit_version"
