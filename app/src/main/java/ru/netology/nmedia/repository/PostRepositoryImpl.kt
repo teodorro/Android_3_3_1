@@ -29,6 +29,7 @@ import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 
 class PostRepositoryImpl(
+    private val apiService: PostsApiService,
     private val postDao: PostDao,
     private val postWorkDao: PostWorkDao
 ) : PostRepository {

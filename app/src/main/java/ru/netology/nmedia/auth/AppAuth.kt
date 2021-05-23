@@ -4,9 +4,12 @@ import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ru.netology.nmedia.api.PostsApiService
 import java.lang.IllegalStateException
 
-class AppAuth private constructor(context: Context) {
+class AppAuth (
+    private val apiService: PostsApiService,
+    context: Context) {
     private val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
     private val idKey = "id"
     private val tokenKey = "token"
@@ -29,21 +32,6 @@ class AppAuth private constructor(context: Context) {
     }
 
     val authStateFlow: StateFlow<AuthState> = _authStateFlow.asStateFlow()
-
-    companion object{
-        @Volatile
-        private var instance: AppAuth? = null
-
-        fun getInstance(): AppAuth = synchronized(this){
-            instance ?: throw IllegalStateException("${AppAuth::class} is not initialized, you must call ${this::initApp.name} first")
-        }
-
-        fun initApp(context: Context) = instance ?: synchronized(this) {
-            instance ?: buildAuth(context).also{instance = it}
-        }
-
-        private fun buildAuth(context: Context): AppAuth = AppAuth(context)
-    }
 
     @Synchronized
     fun setAuth(id: Long, token: String){

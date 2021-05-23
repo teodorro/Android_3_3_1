@@ -14,42 +14,7 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.auth.AuthState
 
-private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
 
-private val logging = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger {
-    if (!it.contains("�")) {
-        Log.i("", it);
-    }
-}).apply {
-    if (BuildConfig.DEBUG) {
-        level = HttpLoggingInterceptor.Level.BODY
-    }
-}
-
-//private val logging = HttpLoggingInterceptor().apply {
-//    if (BuildConfig.DEBUG) {
-//        level = HttpLoggingInterceptor.Level.BODY
-//    }
-//}
-
-private val okhttp = OkHttpClient.Builder()
-    .addInterceptor(logging)
-    .addInterceptor{chain ->
-        AppAuth.getInstance().authStateFlow.value.token?.let { token ->
-            val newRequest = chain.request().newBuilder()
-                .addHeader("Authorization", token)
-                .build()
-            return@addInterceptor chain.proceed(newRequest)
-        }
-        chain.proceed(chain.request())
-    }
-    .build()
-
-private val retrofit = Retrofit.Builder()
-    .addConverterFactory(GsonConverterFactory.create())
-    .baseUrl(BASE_URL)
-    .client(okhttp)
-    .build()
 
 interface PostsApiService {
     @GET("posts")
@@ -85,8 +50,8 @@ interface PostsApiService {
     ): Response<AuthState>
 }
 
-object PostsApi {
-    val service: PostsApiService by lazy {
-        retrofit.create(PostsApiService::class.java)
-    }
-}
+//object PostsApi {
+//    val service: PostsApiService by lazy {
+//        retrofit.create(PostsApiService::class.java)
+//    }
+//}

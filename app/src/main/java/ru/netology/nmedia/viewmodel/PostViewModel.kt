@@ -39,32 +39,28 @@ private val empty = Post(
 
 private val noPhoto = PhotoModel()
 
-class PostViewModel(application: Application) : AndroidViewModel(application) {
-    // упрощённый вариант
-    private val repository: PostRepository =
-        PostRepositoryImpl(
-            AppDb.getInstance(context = application).postDao(),
-            AppDb.getInstance(context = application).postWorkDao()
-        )
+class PostViewModel(
+    private val repository: PostRepository,
+    private val workManager: WorkManager,
+    appAuth: AppAuth
+) : ViewModel() {
 
-    private val workManager: WorkManager =
-        WorkManager.getInstance(application)
 
-//    val data: LiveData<FeedModel> = repository.data
+    //    val data: LiveData<FeedModel> = repository.data
 //        .map(::FeedModel)
 //        .catch { e -> println(e) }
 //        .asLiveData()
-    val data: LiveData<FeedModel> = AppAuth.getInstance()
-    .authStateFlow
-    .flatMapLatest { (myId, _) ->
-        repository.data
-            .map{posts ->
-                FeedModel(
-                    posts.map { it.copy(ownedByMe = it.authorId == myId) },
-                    posts.isEmpty()
-                )
-            }
-    }.asLiveData()
+    val data: LiveData<FeedModel> = appAuth
+        .authStateFlow
+        .flatMapLatest { (myId, _) ->
+            repository.data
+                .map { posts ->
+                    FeedModel(
+                        posts.map { it.copy(ownedByMe = it.authorId == myId) },
+                        posts.isEmpty()
+                    )
+                }
+        }.asLiveData()
 
     private val _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
@@ -171,7 +167,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun removeById(id: Long) {
         viewModelScope.launch {
             try {
-                _dataState.value = FeedModelState(loading = true)   
+                _dataState.value = FeedModelState(loading = true)
 
                 val data = workDataOf(RemovePostWorker.postKey to id)
                 val constraints = Constraints.Builder()
