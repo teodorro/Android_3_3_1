@@ -5,6 +5,8 @@ import android.net.Uri
 import androidx.core.net.toFile
 import androidx.lifecycle.*
 import androidx.work.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -24,6 +26,7 @@ import ru.netology.nmedia.work.RemovePostWorker
 import ru.netology.nmedia.work.SavePostWorker
 import java.io.File
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 private val empty = Post(
     id = 0,
@@ -39,7 +42,9 @@ private val empty = Post(
 
 private val noPhoto = PhotoModel()
 
-class PostViewModel(
+@OptIn(ExperimentalCoroutinesApi::class)
+@HiltViewModel
+class PostViewModel @Inject constructor(
     private val repository: PostRepository,
     private val workManager: WorkManager,
     appAuth: AppAuth

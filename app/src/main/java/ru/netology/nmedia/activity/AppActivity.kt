@@ -12,7 +12,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.firebase.iid.FirebaseInstanceId
+//import com.google.firebase.iid.FirebaseInstanceId
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.auth.AppAuth
@@ -20,7 +20,7 @@ import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
-    private val viewModel: PostViewModel by viewModels(){
+    private val viewModel: PostViewModel by viewModels() {
         DependencyContainer.getInstance().viewModelFactory
     }
 
@@ -54,7 +54,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
         checkGoogleApiAvailability()
 
-        viewModel.data.observe(this){
+        viewModel.data.observe(this) {
             invalidateOptionsMenu()
         }
     }
@@ -62,7 +62,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         var authenticated = appAuth.authStateFlow.value.id != 0L
-        menu?.let{
+        menu?.let {
             it.setGroupVisible(R.id.unauthenticated, !authenticated)
             it.setGroupVisible(R.id.authenticated, authenticated)
         }
@@ -70,7 +70,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId){
+        return when (item.itemId) {
             R.id.signin -> {
                 findNavController(R.id.nav_host_fragment).navigate(R.id.action_feedFragment_to_signInFragment)
                 true
@@ -86,6 +86,24 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
         }
     }
 
+    //    private fun checkGoogleApiAvailability() {
+//        with(GoogleApiAvailability.getInstance()) {
+//            val code = isGooglePlayServicesAvailable(this@AppActivity)
+//            if (code == ConnectionResult.SUCCESS) {
+//                return@with
+//            }
+//            if (isUserResolvableError(code)) {
+//                getErrorDialog(this@AppActivity, code, 9000).show()
+//                return
+//            }
+//            Toast.makeText(this@AppActivity, R.string.google_play_unavailable, Toast.LENGTH_LONG)
+//                .show()
+//        }
+//
+//        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+//            println(it.token)
+//        }
+//    }
     private fun checkGoogleApiAvailability() {
         with(GoogleApiAvailability.getInstance()) {
             val code = isGooglePlayServicesAvailable(this@AppActivity)
@@ -98,10 +116,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             }
             Toast.makeText(this@AppActivity, R.string.google_play_unavailable, Toast.LENGTH_LONG)
                 .show()
-        }
-
-        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
-            println(it.token)
         }
     }
 }

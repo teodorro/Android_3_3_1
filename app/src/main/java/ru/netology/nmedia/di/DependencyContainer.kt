@@ -61,7 +61,7 @@ class DependencyContainer private constructor(context: Context) {
     )
     val workManager = WorkManager.getInstance(context)
 
-    val appAuth = AppAuth(apiService, prefs)
+    val appAuth = AppAuth(prefs)
 
     val viewModelFactory = ViewModelFactory(
         repository,

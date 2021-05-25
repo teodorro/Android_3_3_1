@@ -9,7 +9,8 @@ import ru.netology.nmedia.repository.PostRepositoryImpl
 
 class RemovePostWorker(
     applicationContext: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
+    private val repository: PostRepository,
 ) : CoroutineWorker(applicationContext, params) {
     companion object {
         const val postKey = "post"
@@ -20,11 +21,11 @@ class RemovePostWorker(
         if (id == 0L) {
             return Result.failure()
         }
-        val repository: PostRepository =
-            PostRepositoryImpl(
-                AppDb.getInstance(context = applicationContext).postDao(),
-                AppDb.getInstance(context = applicationContext).postWorkDao(),
-            )
+//        val repository: PostRepository =
+//            PostRepositoryImpl(
+//                AppDb.getInstance(context = applicationContext).postDao(),
+//                AppDb.getInstance(context = applicationContext).postWorkDao(),
+//            )
         return try {
             repository.removeWork(id)
             Result.success()

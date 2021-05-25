@@ -1,6 +1,7 @@
 package ru.netology.nmedia.api
 
 import android.util.Log
+import okhttp3.Interceptor
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -14,7 +15,7 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.auth.AuthState
 
-
+private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
 
 interface PostsApiService {
     @GET("posts")
@@ -49,6 +50,20 @@ interface PostsApiService {
         @Field("pass") pass: String
     ): Response<AuthState>
 }
+
+fun okhttp(vararg interceptors: Interceptor): OkHttpClient = OkHttpClient.Builder()
+    .apply {
+        interceptors.forEach {
+            this.addInterceptor(it)
+        }
+    }
+    .build()
+
+fun retrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
+    .addConverterFactory(GsonConverterFactory.create())
+    .baseUrl(BASE_URL)
+    .client(client)
+    .build()
 
 //object PostsApi {
 //    val service: PostsApiService by lazy {
