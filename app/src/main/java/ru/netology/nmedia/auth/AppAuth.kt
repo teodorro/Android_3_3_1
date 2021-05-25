@@ -1,18 +1,19 @@
 package ru.netology.nmedia.auth
 
-import android.content.Context
+import android.content.SharedPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.netology.nmedia.api.PostsApiService
-import java.lang.IllegalStateException
 
 class AppAuth (
     private val apiService: PostsApiService,
-    context: Context) {
-    private val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
-    private val idKey = "id"
-    private val tokenKey = "token"
+    private val prefs: SharedPreferences,) {
+
+    companion object{
+        val idKey = "id"
+        val tokenKey = "token"
+    }
 
     private val _authStateFlow: MutableStateFlow<AuthState>
 

@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentSigninBinding
+import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.viewmodel.AuthViewModel
 
@@ -17,7 +18,9 @@ class AuthFragment : Fragment() {
 
     private val viewModel: AuthViewModel by viewModels(
         ownerProducer = ::requireParentFragment
-    )
+    ){
+        DependencyContainer.getInstance().viewModelFactory
+    }
 
 
     override fun onCreateView(

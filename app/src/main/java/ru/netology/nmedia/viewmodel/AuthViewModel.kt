@@ -9,7 +9,9 @@ import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.auth.AuthState
 import ru.netology.nmedia.error.ApiError
 
-class AuthViewModel(private val auth: AppAuth, private val apiService: PostsApiService) : ViewModel()  {
+class AuthViewModel(
+    private val auth: AppAuth,
+    private val apiService: PostsApiService) : ViewModel()  {
 
     val data: LiveData<AuthState> = auth
         .authStateFlow

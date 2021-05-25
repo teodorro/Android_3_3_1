@@ -16,13 +16,10 @@ import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.viewmodel.ViewModelFactory
+import java.lang.IllegalStateException
 
-class DependencyContainer private constructor(context: Context){
+class DependencyContainer private constructor(context: Context) {
     private val appDb = Room.databaseBuilder(context, AppDb::class.java, "app.db").build()
-
-    companion object {
-        private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
-    }
 
     private val logging = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger {
         if (!it.contains("�")) {
@@ -33,13 +30,13 @@ class DependencyContainer private constructor(context: Context){
             level = HttpLoggingInterceptor.Level.BODY
         }
     }
-    private val apiService: PostsApiService = retrofit.create(PostsApiService::class.java)
-    val appAuth = AppAuth(apiService, context)
+
+    private val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
 
     private val okhttp = OkHttpClient.Builder()
         .addInterceptor(logging)
-        .addInterceptor{chain ->
-            AppAuth.getInstance().authStateFlow.value.token?.let { token ->
+        .addInterceptor { chain ->
+            prefs.getString(AppAuth.tokenKey, null)?.let { token ->
                 val newRequest = chain.request().newBuilder()
                     .addHeader("Authorization", token)
                     .build()
@@ -55,6 +52,7 @@ class DependencyContainer private constructor(context: Context){
         .client(okhttp)
         .build()
 
+    private val apiService: PostsApiService = retrofit.create(PostsApiService::class.java)
 
     val repository: PostRepository = PostRepositoryImpl(
         apiService,
@@ -63,11 +61,31 @@ class DependencyContainer private constructor(context: Context){
     )
     val workManager = WorkManager.getInstance(context)
 
+    val appAuth = AppAuth(apiService, prefs)
+
     val viewModelFactory = ViewModelFactory(
         repository,
         workManager,
         appAuth,
         apiService
     )
+
+    companion object {
+        private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
+
+        @Volatile
+        private var instance: DependencyContainer? = null
+
+        fun getInstance(): DependencyContainer = synchronized(this) {
+            instance
+                ?: throw IllegalStateException("${DependencyContainer::class} is not initialized, you must call ${this::initApp.name} first")
+        }
+
+        fun initApp(context: Context) = instance ?: synchronized(this) {
+            instance ?: DependencyContainer(context).also { instance = it }
+        }
+
+        //private fun buildAuth(context: Context): AppAuth = AppAuth(context)
+    }
 }
 

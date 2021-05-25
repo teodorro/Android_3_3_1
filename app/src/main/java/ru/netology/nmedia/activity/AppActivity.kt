@@ -16,10 +16,16 @@ import com.google.firebase.iid.FirebaseInstanceId
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
-    private val viewModel: PostViewModel by viewModels()
+    private val viewModel: PostViewModel by viewModels(){
+        DependencyContainer.getInstance().viewModelFactory
+    }
+
+    private val appAuth: AppAuth
+        get() = DependencyContainer.getInstance().appAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +61,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-        var authenticated = AppAuth.getInstance().authStateFlow.value.id != 0L
+        var authenticated = appAuth.authStateFlow.value.id != 0L
         menu?.let{
             it.setGroupVisible(R.id.unauthenticated, !authenticated)
             it.setGroupVisible(R.id.authenticated, authenticated)
@@ -73,7 +79,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                 true
             }
             R.id.signout -> {
-                AppAuth.getInstance().removeAuth()
+                appAuth.removeAuth()
                 true
             }
             else -> super.onOptionsItemSelected(item)
