@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.room.Room
 import androidx.work.Configuration
 import androidx.work.WorkManager
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.firebase.messaging.FirebaseMessaging
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -81,6 +83,9 @@ class DependencyContainer private constructor(context: Context) {
         appAuth,
         apiService
     )
+
+    var firebaseMessaging = FirebaseMessaging.getInstance()
+    var googleApiAvaliability = GoogleApiAvailability.getInstance()
 
     companion object {
         private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
