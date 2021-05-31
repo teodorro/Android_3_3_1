@@ -25,11 +25,6 @@ class SavePostWorker(
         if (id == 0L) {
             return Result.failure()
         }
-//        val repository: PostRepository =
-//            PostRepositoryImpl(
-//                AppDb.getInstance(context = applicationContext).postDao(),
-//                AppDb.getInstance(context = applicationContext).postWorkDao(),
-//            )
         return try {
             repository.processWork(id)
             Result.success()
@@ -39,8 +34,8 @@ class SavePostWorker(
     }
 }
 
-@Singleton
-class SavePostsWorkerFactory @Inject constructor(
+
+class SavePostWorkerFactory (
     private val repository: PostRepository,
 ) : WorkerFactory() {
     override fun createWorker(
@@ -54,3 +49,19 @@ class SavePostsWorkerFactory @Inject constructor(
             null
     }
 }
+
+//@Singleton
+//class SavePostWorkerFactory @Inject constructor(
+//    private val repository: PostRepository,
+//) : WorkerFactory() {
+//    override fun createWorker(
+//        appContext: Context,
+//        workerClassName: String,
+//        workerParameters: WorkerParameters
+//    ): ListenableWorker? = when (workerClassName) {
+//        SavePostWorker::class.java.name ->
+//            SavePostWorker(appContext, workerParameters, repository)
+//        else ->
+//            null
+//    }
+//}

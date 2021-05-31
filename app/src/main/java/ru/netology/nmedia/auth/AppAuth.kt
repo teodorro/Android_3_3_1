@@ -1,6 +1,7 @@
 package ru.netology.nmedia.auth
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.ktx.Firebase
@@ -22,11 +23,15 @@ import ru.netology.nmedia.dto.PushToken
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class AppAuth @Inject constructor(
-    @ApplicationContext private val context: Context,
+//@Singleton
+//class AppAuth @Inject constructor(
+//    @ApplicationContext private val context: Context,
+//) {
+
+class AppAuth (
+    private val apiService: PostsApiService,
+    private val prefs: SharedPreferences,
 ) {
-    private val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
 //    private val idKey = "id"
 //    private val tokenKey = "token"
     companion object{
@@ -84,18 +89,29 @@ class AppAuth @Inject constructor(
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 val pushToken = PushToken(token ?: Firebase.messaging.token.await())
-                getApiService(context).save(pushToken)
+                apiService.save(pushToken)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
 
-    private fun getApiService(context: Context): PostsApiService {
-        val hiltEntryPoint = EntryPointAccessors.fromApplication(
-            context,
-            AppAuthEntryPoint::class.java
-        )
-        return hiltEntryPoint.apiService()
-    }
+//    fun sendPushToken(token: String? = null) {
+//        CoroutineScope(Dispatchers.Default).launch {
+//            try {
+//                val pushToken = PushToken(token ?: Firebase.messaging.token.await())
+//                getApiService(context).save(pushToken)
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//            }
+//        }
+//    }
+
+//    private fun getApiService(context: Context): PostsApiService {
+//        val hiltEntryPoint = EntryPointAccessors.fromApplication(
+//            context,
+//            AppAuthEntryPoint::class.java
+//        )
+//        return hiltEntryPoint.apiService()
+//    }
 }

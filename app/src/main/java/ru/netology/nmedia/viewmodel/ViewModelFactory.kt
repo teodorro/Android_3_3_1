@@ -13,7 +13,8 @@ class ViewModelFactory(
     private val appAuth: AppAuth,
     private val apiService: PostsApiService
 ) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T =
         when{
             modelClass.isAssignableFrom(PostViewModel::class.java) -> {
                 PostViewModel(repository, workManager, appAuth) as T
@@ -24,6 +25,4 @@ class ViewModelFactory(
             else -> error("Unknown viewmodel class :${modelClass.name}")
 
         }
-    }
-
 }

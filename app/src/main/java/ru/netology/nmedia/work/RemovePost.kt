@@ -2,6 +2,8 @@ package ru.netology.nmedia.work
 
 import android.content.Context
 import androidx.work.CoroutineWorker
+import androidx.work.ListenableWorker
+import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.repository.PostRepository
@@ -21,16 +23,27 @@ class RemovePostWorker(
         if (id == 0L) {
             return Result.failure()
         }
-//        val repository: PostRepository =
-//            PostRepositoryImpl(
-//                AppDb.getInstance(context = applicationContext).postDao(),
-//                AppDb.getInstance(context = applicationContext).postWorkDao(),
-//            )
         return try {
             repository.removeWork(id)
             Result.success()
         } catch (e: Exception) {
             Result.retry()
         }
+    }
+}
+
+
+class RemovePostWorkerFactory (
+    private val repository: PostRepository,
+) : WorkerFactory() {
+    override fun createWorker(
+        appContext: Context,
+        workerClassName: String,
+        workerParameters: WorkerParameters
+    ): ListenableWorker? = when (workerClassName) {
+        RemovePostWorker::class.java.name ->
+            RemovePostWorker(appContext, workerParameters, repository)
+        else ->
+            null
     }
 }

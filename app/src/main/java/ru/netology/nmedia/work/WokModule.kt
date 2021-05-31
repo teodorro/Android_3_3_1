@@ -10,20 +10,20 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
-@Module
-object WokModule {
-    @Provides
-    @Singleton
-    fun provideWorkManager(
-        @ApplicationContext context: Context,
-        workerFactory: DependencyWorkerFactory,
-    ): WorkManager {
-        WorkManager.initialize(
-            context, Configuration.Builder()
-                .setWorkerFactory(workerFactory)
-                .build()
-        )
-        return WorkManager.getInstance(context)
-    }
-}
+//@InstallIn(SingletonComponent::class)
+//@Module
+//object WokModule {
+//    @Provides
+//    @Singleton
+//    fun provideWorkManager(
+//        @ApplicationContext context: Context,
+//        workerFactory: DependencyWorkerFactory,
+//    ): WorkManager {
+//        WorkManager.initialize(
+//            context, Configuration.Builder()
+//                .setWorkerFactory(workerFactory)
+//                .build()
+//        )
+//        return WorkManager.getInstance(context)
+//    }
+//}

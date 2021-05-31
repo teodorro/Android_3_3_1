@@ -16,13 +16,13 @@ import ru.netology.nmedia.di.DependencyContainer
 import javax.inject.Inject
 import kotlin.random.Random
 
-@AndroidEntryPoint
+//@AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
     private val action = "action"
     private val content = "content"
     private val channelId = "remote"
     private val gson = Gson()
-    @Inject
+    //@Inject
 
     override fun onCreate() {
         super.onCreate()

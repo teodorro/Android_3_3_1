@@ -23,12 +23,6 @@ class RefreshPostsWorker(
     }
 
     override suspend fun doWork(): Result = withContext(Dispatchers.Default) {
-//        val repository: PostRepository =
-//            PostRepositoryImpl(
-//                AppDb.getInstance(context = applicationContext).postDao(),
-//                AppDb.getInstance(context = applicationContext).postWorkDao(),
-//            )
-
         try {
             repository.getAll()
             Result.success()
@@ -39,8 +33,7 @@ class RefreshPostsWorker(
     }
 }
 
-@Singleton
-class RefreshPostsWorkerFactory @Inject constructor(
+class RefreshPostsWorkerFactory (
     private val repository: PostRepository,
 ) : WorkerFactory() {
     override fun createWorker(
@@ -54,3 +47,19 @@ class RefreshPostsWorkerFactory @Inject constructor(
             null
     }
 }
+
+//@Singleton
+//class RefreshPostsWorkerFactory @Inject constructor(
+//    private val repository: PostRepository,
+//) : WorkerFactory() {
+//    override fun createWorker(
+//        appContext: Context,
+//        workerClassName: String,
+//        workerParameters: WorkerParameters
+//    ): ListenableWorker? = when (workerClassName) {
+//        RefreshPostsWorker::class.java.name ->
+//            RefreshPostsWorker(appContext, workerParameters, repository)
+//        else ->
+//            null
+//    }
+//}

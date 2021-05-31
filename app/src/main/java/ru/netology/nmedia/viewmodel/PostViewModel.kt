@@ -42,9 +42,16 @@ private val empty = Post(
 
 private val noPhoto = PhotoModel()
 
-@OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class PostViewModel @Inject constructor(
+//@OptIn(ExperimentalCoroutinesApi::class)
+//@HiltViewModel
+//class PostViewModel @Inject constructor(
+//    private val repository: PostRepository,
+//    private val workManager: WorkManager,
+//    appAuth: AppAuth
+//) : ViewModel() {
+
+
+class PostViewModel (
     private val repository: PostRepository,
     private val workManager: WorkManager,
     appAuth: AppAuth

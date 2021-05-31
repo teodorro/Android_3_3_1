@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.room.Room
+import androidx.work.Configuration
 import androidx.work.WorkManager
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -16,6 +17,7 @@ import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.viewmodel.ViewModelFactory
+import ru.netology.nmedia.work.DependencyWorkerFactory
 import java.lang.IllegalStateException
 
 class DependencyContainer private constructor(context: Context) {
@@ -59,9 +61,19 @@ class DependencyContainer private constructor(context: Context) {
         appDb.postDao(),
         appDb.postWorkDao(),
     )
-    val workManager = WorkManager.getInstance(context)
 
-    val appAuth = AppAuth(prefs)
+    //    val workManager = WorkManager.getInstance(context)
+    val workManager = run {
+        WorkManager.initialize(
+            context,
+            Configuration.Builder()
+                .setWorkerFactory(DependencyWorkerFactory(repository))
+                .build()
+        )
+        WorkManager.getInstance(context)
+    }
+
+    val appAuth = AppAuth(apiService, prefs)
 
     val viewModelFactory = ViewModelFactory(
         repository,

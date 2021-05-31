@@ -11,11 +11,16 @@ import ru.netology.nmedia.auth.AuthState
 import ru.netology.nmedia.error.ApiError
 import javax.inject.Inject
 
-@HiltViewModel
-class AuthViewModel @Inject constructor(
+//@HiltViewModel
+//class AuthViewModel @Inject constructor(
+//    private val auth: AppAuth,
+//    private val apiService: PostsApiService
+//    ) : ViewModel() {
+
+class AuthViewModel (
     private val auth: AppAuth,
     private val apiService: PostsApiService
-    ) : ViewModel() {
+) : ViewModel() {
     val data: LiveData<AuthState> = auth.authStateFlow
         .asLiveData(Dispatchers.Default)
     val authenticated: Boolean
