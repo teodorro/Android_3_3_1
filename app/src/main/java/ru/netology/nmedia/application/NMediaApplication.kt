@@ -34,10 +34,14 @@ class NMediaApplication : Application() {
             val request = PeriodicWorkRequestBuilder<RefreshPostsWorker>(1, TimeUnit.MINUTES)
                 .setConstraints(constraints)
                 .build()
-            WorkManager.getInstance(this@NMediaApplication).enqueueUniquePeriodicWork(
+            DependencyContainer.getInstance().workManager.enqueueUniquePeriodicWork(
                 RefreshPostsWorker.name,
                 ExistingPeriodicWorkPolicy.KEEP,
                 request
+//            WorkManager.getInstance(this@NMediaApplication).enqueueUniquePeriodicWork(
+//                RefreshPostsWorker.name,
+//                ExistingPeriodicWorkPolicy.KEEP,
+//                request
             )
         }
     }
