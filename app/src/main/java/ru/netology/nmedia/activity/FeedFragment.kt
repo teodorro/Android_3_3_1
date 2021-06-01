@@ -8,11 +8,14 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
@@ -78,16 +81,16 @@ class FeedFragment : Fragment() {
             }
         })
 
-        viewModel.data.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state.posts) {
-                if (newPostsWasPressed) {
-                    val lm = binding.recyclerView.layoutManager
-                    lm?.smoothScrollToPosition(binding.recyclerView, RecyclerView.State(), 0)
-                    newPostsWasPressed = false
-                }
-            }
-            binding.emptyText.isVisible = state.empty
-        }
+//        viewModel.data.observe(viewLifecycleOwner) { state ->
+//            adapter.submitList(state.posts) {
+//                if (newPostsWasPressed) {
+//                    val lm = binding.recyclerView.layoutManager
+//                    lm?.smoothScrollToPosition(binding.recyclerView, RecyclerView.State(), 0)
+//                    newPostsWasPressed = false
+//                }
+//            }
+//            binding.emptyText.isVisible = state.empty
+//        }
 
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()
@@ -104,11 +107,26 @@ class FeedFragment : Fragment() {
             newPostsWasPressed = true
         }
 
-        viewModel.newerCount.observe(viewLifecycleOwner) {
-            println("------------------------------------------")
-            println(it)
-            binding.fabNewPosts.isVisible = it > 0
+//        viewModel.newerCount.observe(viewLifecycleOwner) {
+//            println("------------------------------------------")
+//            println(it)
+//            binding.fabNewPosts.isVisible = it > 0
+//        }
+
+        lifecycleScope.launchWhenCreated {
+            viewModel.data.collectLatest(adapter::submitData)
         }
+
+        lifecycleScope.launchWhenCreated {
+            adapter.loadStateFlow.collectLatest { state ->
+                binding.swiperefresh.isRefreshing =
+                    state.refresh is LoadState.Loading ||
+                            state.prepend is LoadState.Loading ||
+                            state.append is LoadState.Loading
+            }
+        }
+
+        binding.swiperefresh.setOnRefreshListener(adapter::refresh)
 
         return binding.root
     }

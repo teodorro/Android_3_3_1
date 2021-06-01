@@ -64,34 +64,34 @@ class PicFragment : Fragment() {
         )
         fragmentBinding = binding
 
-        viewModel.data.observe(viewLifecycleOwner) { state ->
-            val post = viewModel.data.value!!.posts.firstOrNull { x -> x.id == viewModel.selectedId }
-            if (post != null) {
-                if (post.id != idOnScreen) {
-                    idOnScreen = post.id
-                    if (post.attachment != null) {
-                        val urlAttachment = "http://10.0.2.2:9999/media/${post.attachment.url}"
-                        Glide.with(binding.picViewAttachment)
-                            .load(urlAttachment)
-                            .placeholder(R.drawable.common_full_open_on_phone)
-                            .error(R.drawable.ic_baseline_error_24)
-                            .timeout(10_000)
-                            .into(binding.picViewAttachment)
-                    }
-                }
-                binding.like.text = post.likes.toString()
-                binding.like.isChecked = post.likedByMe
-            }
-        }
-
-        binding.like.setOnClickListener {
-            binding.like.isChecked = !binding.like.isChecked
-            val post =
-                viewModel.data.value!!.posts.firstOrNull { x -> x.id == viewModel.selectedId }
-            if (post != null) {
-                viewModel.likeById(post.id)
-            }
-        }
+//        viewModel.data.observe(viewLifecycleOwner) { state ->
+//            val post = viewModel.data.value!!.posts.firstOrNull { x -> x.id == viewModel.selectedId }
+//            if (post != null) {
+//                if (post.id != idOnScreen) {
+//                    idOnScreen = post.id
+//                    if (post.attachment != null) {
+//                        val urlAttachment = "http://10.0.2.2:9999/media/${post.attachment.url}"
+//                        Glide.with(binding.picViewAttachment)
+//                            .load(urlAttachment)
+//                            .placeholder(R.drawable.common_full_open_on_phone)
+//                            .error(R.drawable.ic_baseline_error_24)
+//                            .timeout(10_000)
+//                            .into(binding.picViewAttachment)
+//                    }
+//                }
+//                binding.like.text = post.likes.toString()
+//                binding.like.isChecked = post.likedByMe
+//            }
+//        }
+//
+//        binding.like.setOnClickListener {
+//            binding.like.isChecked = !binding.like.isChecked
+//            val post =
+//                viewModel.data.value!!.posts.firstOrNull { x -> x.id == viewModel.selectedId }
+//            if (post != null) {
+//                viewModel.likeById(post.id)
+//            }
+//        }
 
         return binding.root
     }

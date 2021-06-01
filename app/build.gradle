@@ -25,6 +25,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
     }
 
     buildFeatures {
@@ -78,6 +79,7 @@ dependencies {
     def yalantis_version = "2.2.6"
     def workmanager_version = "2.5.0"
     def hilt_work_version = "1.0.0"
+    def paging_version = "3.0.0"
     def play_services_base_version = "17.6.0"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
@@ -114,6 +116,7 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
     implementation "androidx.hilt:hilt-work:$hilt_work_version"
+    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
 
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "androidx.test.ext:junit:$ext_junit_version"

@@ -53,6 +53,21 @@ interface PostsApiService {
         @Field("login") login: String,
         @Field("pass") pass: String
     ): Response<AuthState>
+
+    @GET("posts/{id}/before")
+    suspend fun getBefore(
+        @Path("id") id: Long,
+        @Query("count") count: Int
+    ): Response<List<Post>>
+
+    @GET("posts/{id}/after")
+    suspend fun getAfter(
+        @Path("id") id: Long,
+        @Query("count") count: Int
+    ): Response<List<Post>>
+
+    @GET("posts/latest")
+    suspend fun getLatest(@Query("count") count: Int): Response<List<Post>>
 }
 
 fun okhttp(vararg interceptors: Interceptor): OkHttpClient = OkHttpClient.Builder()
