@@ -63,25 +63,9 @@ class PostViewModel (
 ) : ViewModel() {
 
 
-//    val data: LiveData<FeedModel> = appAuth
-//        .authStateFlow
-//        .flatMapLatest { (myId, _) ->
-//            repository.data
-//                .map { posts ->
-//                    FeedModel(
-//                        posts.map { it.copy(ownedByMe = it.authorId == myId) },
-//                        posts.isEmpty()
-//                    )
-//                }
-//        }.asLiveData()
-
-    private val cached = repository
-        .data
-        .cachedIn(viewModelScope)
-
     val data: Flow<PagingData<Post>> = appAuth.authStateFlow
         .flatMapLatest { (myId, _) ->
-            cached.map { pagingData ->
+            repository.data.map { pagingData ->
                 pagingData.map { post ->
                     post.copy(ownedByMe = post.authorId == myId)
                 }
@@ -108,8 +92,8 @@ class PostViewModel (
     val photo: LiveData<PhotoModel>
         get() = _photo
 
-    var selectedId = 0L
-
+//    var selectedId = 0L
+    var selectedPost: Post? = null
 
     init {
         loadPosts()
