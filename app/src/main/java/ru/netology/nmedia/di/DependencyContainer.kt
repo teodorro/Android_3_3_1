@@ -59,9 +59,10 @@ class DependencyContainer private constructor(context: Context) {
     private val apiService: PostsApiService = retrofit.create(PostsApiService::class.java)
 
     val repository: PostRepository = PostRepositoryImpl(
-        apiService,
+        appDb,
         appDb.postDao(),
         appDb.postWorkDao(),
+        apiService,
     )
 
     //    val workManager = WorkManager.getInstance(context)
