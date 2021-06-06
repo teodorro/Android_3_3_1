@@ -27,11 +27,14 @@ import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PostRepositoryImpl(
-    private val apiService: PostsApiService,
+@Singleton
+class PostRepositoryImpl @Inject constructor(
     private val postDao: PostDao,
-    private val postWorkDao: PostWorkDao
+    private val postWorkDao: PostWorkDao,
+    private val apiService: PostsApiService,
 ) : PostRepository {
 
     override val data = postDao.getAll()
@@ -184,7 +187,6 @@ class PostRepositoryImpl(
 
     override suspend fun processWork(id: Long) {
         try {// TODO: handle this in homework
-
             val entity = postWorkDao.getById(id)
             var post = entity.toDto()
             if (entity.uri != null) {

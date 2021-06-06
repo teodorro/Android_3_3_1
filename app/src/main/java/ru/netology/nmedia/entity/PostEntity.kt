@@ -31,9 +31,7 @@ data class PostEntity(
     }
 }
 
-// extension methods?
 fun List<PostEntity>.toDto(): List<Post> = map(PostEntity::toDto)
-//fun List<Post>.toEntity(wasSeen: Boolean): List<PostEntity> = map(PostEntity::fromDto)
 fun List<Post>.toEntity(wasSeen: Boolean): List<PostEntity> {
     var postEntities = mutableListOf<PostEntity>()
     for (post in this){

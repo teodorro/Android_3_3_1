@@ -69,8 +69,3 @@ fun retrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
     .client(client)
     .build()
 
-//object PostsApi {
-//    val service: PostsApiService by lazy {
-//        retrofit.create(PostsApiService::class.java)
-//    }
-//}

@@ -8,6 +8,8 @@ import androidx.work.WorkerParameters
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
+import javax.inject.Inject
+import javax.inject.Singleton
 
 class RemovePostWorker(
     applicationContext: Context,
@@ -32,8 +34,8 @@ class RemovePostWorker(
     }
 }
 
-
-class RemovePostWorkerFactory (
+@Singleton
+class RemovePostWorkerFactory @Inject constructor(
     private val repository: PostRepository,
 ) : WorkerFactory() {
     override fun createWorker(
