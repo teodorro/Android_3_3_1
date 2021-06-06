@@ -5,6 +5,8 @@ import android.net.Uri
 import androidx.core.net.toFile
 import androidx.lifecycle.*
 import androidx.work.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -24,6 +26,7 @@ import ru.netology.nmedia.work.RemovePostWorker
 import ru.netology.nmedia.work.SavePostWorker
 import java.io.File
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 private val empty = Post(
     id = 0,
@@ -39,32 +42,25 @@ private val empty = Post(
 
 private val noPhoto = PhotoModel()
 
-class PostViewModel(application: Application) : AndroidViewModel(application) {
-    // упрощённый вариант
-    private val repository: PostRepository =
-        PostRepositoryImpl(
-            AppDb.getInstance(context = application).postDao(),
-            AppDb.getInstance(context = application).postWorkDao()
-        )
+@OptIn(ExperimentalCoroutinesApi::class)
+@HiltViewModel
+class PostViewModel @Inject constructor(
+    private val repository: PostRepository,
+    private val workManager: WorkManager,
+    appAuth: AppAuth
+) : ViewModel() {
 
-    private val workManager: WorkManager =
-        WorkManager.getInstance(application)
-
-//    val data: LiveData<FeedModel> = repository.data
-//        .map(::FeedModel)
-//        .catch { e -> println(e) }
-//        .asLiveData()
-    val data: LiveData<FeedModel> = AppAuth.getInstance()
-    .authStateFlow
-    .flatMapLatest { (myId, _) ->
-        repository.data
-            .map{posts ->
-                FeedModel(
-                    posts.map { it.copy(ownedByMe = it.authorId == myId) },
-                    posts.isEmpty()
-                )
-            }
-    }.asLiveData()
+    val data: LiveData<FeedModel> = appAuth
+        .authStateFlow
+        .flatMapLatest { (myId, _) ->
+            repository.data
+                .map { posts ->
+                    FeedModel(
+                        posts.map { it.copy(ownedByMe = it.authorId == myId) },
+                        posts.isEmpty()
+                    )
+                }
+        }.asLiveData()
 
     private val _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
@@ -113,7 +109,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             _dataState.value = FeedModelState(error = true)
         }
     }
-
 
     fun save() {
         edited.value?.let {
@@ -171,7 +166,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun removeById(id: Long) {
         viewModelScope.launch {
             try {
-                _dataState.value = FeedModelState(loading = true)   
+                _dataState.value = FeedModelState(loading = true)
 
                 val data = workDataOf(RemovePostWorker.postKey to id)
                 val constraints = Constraints.Builder()
