@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
@@ -64,7 +65,6 @@ class FeedFragment : Fragment() {
             }
 
             override fun onShowPicAttachment(post: Post) {
-//                viewModel.selectedId = post.id
                 viewModel.selectedPost = post
                 findNavController().navigate(R.id.action_feedFragment_to_picFragment)
             }
@@ -81,17 +81,6 @@ class FeedFragment : Fragment() {
             }
         })
 
-//        viewModel.data.observe(viewLifecycleOwner) { state ->
-//            adapter.submitList(state.posts) {
-//                if (newPostsWasPressed) {
-//                    val lm = binding.recyclerView.layoutManager
-//                    lm?.smoothScrollToPosition(binding.recyclerView, RecyclerView.State(), 0)
-//                    newPostsWasPressed = false
-//                }
-//            }
-//            binding.emptyText.isVisible = state.empty
-//        }
-
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()
             viewModel.updateWasSeen()
@@ -106,12 +95,6 @@ class FeedFragment : Fragment() {
             binding.fabNewPosts.isVisible = false
             newPostsWasPressed = true
         }
-
-//        viewModel.newerCount.observe(viewLifecycleOwner) {
-//            println("------------------------------------------")
-//            println(it)
-//            binding.fabNewPosts.isVisible = it > 0
-//        }
 
         lifecycleScope.launchWhenCreated {
             viewModel.data.collectLatest(adapter::submitData)

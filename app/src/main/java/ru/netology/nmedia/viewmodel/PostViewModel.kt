@@ -55,8 +55,8 @@ class PostViewModel @Inject constructor(
     appAuth: AppAuth
 ) : ViewModel() {
 
-    val data: LiveData<FeedModel> = appAuth
-        .authStateFlow.flatMapLatest { (myId, _) ->
+    val data: Flow<PagingData<Post>> = appAuth.authStateFlow
+        .flatMapLatest { (myId, _) ->
             repository.data.map { pagingData ->
                 pagingData.map { post ->
                     post.copy(ownedByMe = post.authorId == myId)
@@ -73,18 +73,10 @@ class PostViewModel @Inject constructor(
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
-//    val newerCount: LiveData<Int> = data.switchMap {
-//        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
-//            .catch { e -> e.printStackTrace() }
-//            .asLiveData()
-//    }
-
-
     private val _photo = MutableLiveData(noPhoto)
     val photo: LiveData<PhotoModel>
         get() = _photo
 
-//    var selectedId = 0L
     var selectedPost: Post? = null
 
     init {
