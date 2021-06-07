@@ -47,24 +47,16 @@ private val empty = Post(
 
 private val noPhoto = PhotoModel()
 
-//@OptIn(ExperimentalCoroutinesApi::class)
-//@HiltViewModel
-//class PostViewModel @Inject constructor(
-//    private val repository: PostRepository,
-//    private val workManager: WorkManager,
-//    appAuth: AppAuth
-//) : ViewModel() {
-
-
-class PostViewModel (
+@OptIn(ExperimentalCoroutinesApi::class)
+@HiltViewModel
+class PostViewModel @Inject constructor(
     private val repository: PostRepository,
     private val workManager: WorkManager,
     appAuth: AppAuth
 ) : ViewModel() {
 
-
-    val data: Flow<PagingData<Post>> = appAuth.authStateFlow
-        .flatMapLatest { (myId, _) ->
+    val data: LiveData<FeedModel> = appAuth
+        .authStateFlow.flatMapLatest { (myId, _) ->
             repository.data.map { pagingData ->
                 pagingData.map { post ->
                     post.copy(ownedByMe = post.authorId == myId)
@@ -120,7 +112,6 @@ class PostViewModel (
             _dataState.value = FeedModelState(error = true)
         }
     }
-
 
     fun save() {
         edited.value?.let {

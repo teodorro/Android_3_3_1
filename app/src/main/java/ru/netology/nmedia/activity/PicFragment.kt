@@ -9,15 +9,15 @@ import androidx.lifecycle.asLiveData
 import androidx.paging.filter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.coroutines.flow.collectLatest
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentPicBinding
-import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
 
+@AndroidEntryPoint
 class PicFragment : Fragment() {
 
     companion object {
@@ -25,10 +25,8 @@ class PicFragment : Fragment() {
     }
 
     private val viewModel: PostViewModel by viewModels(
-        ownerProducer = ::requireParentFragment
-    ){
-        DependencyContainer.getInstance().viewModelFactory
-    }
+        ownerProducer = ::requireParentFragment,
+    )
 
     private var fragmentBinding: FragmentPicBinding? = null
     private var idOnScreen: Long? = null
