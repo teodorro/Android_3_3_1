@@ -1,6 +1,7 @@
 package ru.netology.nmedia.repository
 
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.lifecycle.*
@@ -200,8 +201,8 @@ class PostRepositoryImpl @Inject constructor(
             }
             save(post)
 
-            println(entity.id)
-            println(post.id)
+            Log.d(null, entity.id.toString())
+            Log.d(null, post.id.toString())
         } catch (e: Exception) {
             throw UnknownError
         }

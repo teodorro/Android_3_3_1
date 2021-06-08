@@ -11,9 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.LinearSmoothScroller
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -65,7 +62,7 @@ class FeedFragment : Fragment() {
             }
 
             override fun onShowPicAttachment(post: Post) {
-                viewModel.selectedPost = post
+                viewModel.selectedPost.value = post
                 findNavController().navigate(R.id.action_feedFragment_to_picFragment)
             }
         })

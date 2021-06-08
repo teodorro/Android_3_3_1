@@ -1,8 +1,8 @@
 package ru.netology.nmedia.activity
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -13,10 +13,8 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.EntryPointAccessors
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
-import ru.netology.nmedia.api.PostsApiService
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.viewmodel.AuthViewModel
 import javax.inject.Inject
@@ -62,12 +60,11 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
         firebaseMessaging.token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
-                println("some stuff happened: ${task.exception}")
+                Log.d(null, "some stuff happened: ${task.exception}")
                 return@addOnCompleteListener
             }
-
             val token = task.result
-            println(token)
+            Log.d(null, token)
         }
 
         checkGoogleApiAvailability()

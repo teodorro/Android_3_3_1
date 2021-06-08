@@ -24,7 +24,6 @@ class PostsAdapter(
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        // ? FIXME: students will do in HW
         getItem(position)?.let {
             holder.bind(it)
         }
