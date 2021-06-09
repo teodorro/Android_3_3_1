@@ -59,10 +59,8 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
         }
 
         firebaseMessaging.token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
+            if (!task.isSuccessful)
                 Log.d(null, "some stuff happened: ${task.exception}")
-                return@addOnCompleteListener
-            }
             val token = task.result
             Log.d(null, token)
         }
