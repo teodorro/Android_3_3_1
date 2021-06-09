@@ -19,7 +19,7 @@ class RefreshPostsWorker(
     private val repository: PostRepository,
 ) : CoroutineWorker(applicationContext, params) {
     companion object {
-        const val name = "ru.netology.work.RefreshPostsWorker"
+        const val NAME = "ru.netology.work.RefreshPostsWorker"
     }
 
     override suspend fun doWork(): Result = withContext(Dispatchers.Default) {
@@ -31,35 +31,20 @@ class RefreshPostsWorker(
             Result.retry()
         }
     }
-}
 
-class RefreshPostsWorkerFactory (
-    private val repository: PostRepository,
-) : WorkerFactory() {
-    override fun createWorker(
-        appContext: Context,
-        workerClassName: String,
-        workerParameters: WorkerParameters
-    ): ListenableWorker? = when (workerClassName) {
-        RefreshPostsWorker::class.java.name ->
-            RefreshPostsWorker(appContext, workerParameters, repository)
-        else ->
-            null
+    @Singleton
+    class Factory @Inject constructor(
+        private val repository: PostRepository,
+    ) : WorkerFactory() {
+        override fun createWorker(
+            appContext: Context,
+            workerClassName: String,
+            workerParameters: WorkerParameters
+        ): ListenableWorker? = when (workerClassName) {
+            RefreshPostsWorker::class.java.name ->
+                RefreshPostsWorker(appContext, workerParameters, repository)
+            else ->
+                null
+        }
     }
 }
-
-//@Singleton
-//class RefreshPostsWorkerFactory @Inject constructor(
-//    private val repository: PostRepository,
-//) : WorkerFactory() {
-//    override fun createWorker(
-//        appContext: Context,
-//        workerClassName: String,
-//        workerParameters: WorkerParameters
-//    ): ListenableWorker? = when (workerClassName) {
-//        RefreshPostsWorker::class.java.name ->
-//            RefreshPostsWorker(appContext, workerParameters, repository)
-//        else ->
-//            null
-//    }
-//}

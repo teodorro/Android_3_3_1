@@ -11,26 +11,23 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.LinearSmoothScroller
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
-import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.viewmodel.PostViewModel
 
-
+@AndroidEntryPoint
 class FeedFragment : Fragment() {
-
     private var newPostsWasPressed: Boolean = false
-    private val viewModel: PostViewModel by viewModels(ownerProducer = ::requireParentFragment){
-        DependencyContainer.getInstance().viewModelFactory
-    }
+
+    private val viewModel: PostViewModel by viewModels(
+        ownerProducer = ::requireParentFragment,
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,8 +62,7 @@ class FeedFragment : Fragment() {
             }
 
             override fun onShowPicAttachment(post: Post) {
-//                viewModel.selectedId = post.id
-                viewModel.selectedPost = post
+                viewModel.selectedPost.value = post
                 findNavController().navigate(R.id.action_feedFragment_to_picFragment)
             }
         })
@@ -82,17 +78,6 @@ class FeedFragment : Fragment() {
             }
         })
 
-//        viewModel.data.observe(viewLifecycleOwner) { state ->
-//            adapter.submitList(state.posts) {
-//                if (newPostsWasPressed) {
-//                    val lm = binding.recyclerView.layoutManager
-//                    lm?.smoothScrollToPosition(binding.recyclerView, RecyclerView.State(), 0)
-//                    newPostsWasPressed = false
-//                }
-//            }
-//            binding.emptyText.isVisible = state.empty
-//        }
-
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()
             viewModel.updateWasSeen()
@@ -107,12 +92,6 @@ class FeedFragment : Fragment() {
             binding.fabNewPosts.isVisible = false
             newPostsWasPressed = true
         }
-
-//        viewModel.newerCount.observe(viewLifecycleOwner) {
-//            println("------------------------------------------")
-//            println(it)
-//            binding.fabNewPosts.isVisible = it > 0
-//        }
 
         lifecycleScope.launchWhenCreated {
             viewModel.data.collectLatest(adapter::submitData)

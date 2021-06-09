@@ -5,9 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.repository.PostRepository
-import ru.netology.nmedia.repository.PostRepositoryImpl
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,11 +15,11 @@ class SavePostWorker(
     private val repository: PostRepository,
 ) : CoroutineWorker(applicationContext, params) {
     companion object {
-        const val postKey = "post"
+        const val POST_KEY = "post"
     }
 
     override suspend fun doWork(): Result {
-        val id = inputData.getLong(postKey, 0L)
+        val id = inputData.getLong(POST_KEY, 0L)
         if (id == 0L) {
             return Result.failure()
         }
@@ -32,36 +30,20 @@ class SavePostWorker(
             Result.retry()
         }
     }
-}
 
-
-class SavePostWorkerFactory (
-    private val repository: PostRepository,
-) : WorkerFactory() {
-    override fun createWorker(
-        appContext: Context,
-        workerClassName: String,
-        workerParameters: WorkerParameters
-    ): ListenableWorker? = when (workerClassName) {
-        SavePostWorker::class.java.name ->
-            SavePostWorker(appContext, workerParameters, repository)
-        else ->
-            null
+    @Singleton
+    class Factory @Inject constructor(
+        private val repository: PostRepository,
+    ) : WorkerFactory() {
+        override fun createWorker(
+            appContext: Context,
+            workerClassName: String,
+            workerParameters: WorkerParameters
+        ): ListenableWorker? = when (workerClassName) {
+            SavePostWorker::class.java.name ->
+                SavePostWorker(appContext, workerParameters, repository)
+            else ->
+                null
+        }
     }
 }
-
-//@Singleton
-//class SavePostWorkerFactory @Inject constructor(
-//    private val repository: PostRepository,
-//) : WorkerFactory() {
-//    override fun createWorker(
-//        appContext: Context,
-//        workerClassName: String,
-//        workerParameters: WorkerParameters
-//    ): ListenableWorker? = when (workerClassName) {
-//        SavePostWorker::class.java.name ->
-//            SavePostWorker(appContext, workerParameters, repository)
-//        else ->
-//            null
-//    }
-//}

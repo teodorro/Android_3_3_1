@@ -15,6 +15,4 @@ import ru.netology.nmedia.entity.PostWorkEntity
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao
     abstract fun postWorkDao(): PostWorkDao
-
-
 }

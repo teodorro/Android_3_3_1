@@ -1,6 +1,7 @@
 package ru.netology.nmedia.repository
 
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.lifecycle.*
@@ -30,8 +31,13 @@ import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PostRepositoryImpl(
+@Singleton
+class PostRepositoryImpl @Inject constructor(
+    private val postDao: PostDao,
+    private val postWorkDao: PostWorkDao,
     appDb: AppDb,
     private val postDao: PostDao,
     postRemoteKeyDao: PostRemoteKeyDao,
@@ -194,7 +200,6 @@ class PostRepositoryImpl(
 
     override suspend fun processWork(id: Long) {
         try {// TODO: handle this in homework
-
             val entity = postWorkDao.getById(id)
             var post = entity.toDto()
             if (entity.uri != null) {
@@ -204,8 +209,8 @@ class PostRepositoryImpl(
             }
             save(post)
 
-            println(entity.id)
-            println(post.id)
+            Log.d(null, entity.id.toString())
+            Log.d(null, post.id.toString())
         } catch (e: Exception) {
             throw UnknownError
         }

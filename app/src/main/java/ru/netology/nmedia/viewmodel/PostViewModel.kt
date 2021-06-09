@@ -1,36 +1,31 @@
 package ru.netology.nmedia.viewmodel
 
-import android.app.Application
 import android.net.Uri
 import androidx.core.net.toFile
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import androidx.paging.flatMap
 import androidx.paging.map
 import androidx.work.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import ru.netology.nmedia.db.AppDb
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.repository.PostRepository
-import ru.netology.nmedia.repository.PostRepositoryImpl
-import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.util.SingleLiveEvent
-import ru.netology.nmedia.work.RefreshPostsWorker
 import ru.netology.nmedia.work.RemovePostWorker
 import ru.netology.nmedia.work.SavePostWorker
 import java.io.File
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private val empty = Post(
@@ -47,21 +42,13 @@ private val empty = Post(
 
 private val noPhoto = PhotoModel()
 
-//@OptIn(ExperimentalCoroutinesApi::class)
-//@HiltViewModel
-//class PostViewModel @Inject constructor(
-//    private val repository: PostRepository,
-//    private val workManager: WorkManager,
-//    appAuth: AppAuth
-//) : ViewModel() {
-
-
-class PostViewModel (
+@OptIn(ExperimentalCoroutinesApi::class)
+@HiltViewModel
+class PostViewModel @Inject constructor(
     private val repository: PostRepository,
     private val workManager: WorkManager,
     appAuth: AppAuth
 ) : ViewModel() {
-
 
     val data: Flow<PagingData<Post>> = appAuth.authStateFlow
         .flatMapLatest { (myId, _) ->
@@ -81,19 +68,11 @@ class PostViewModel (
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
-//    val newerCount: LiveData<Int> = data.switchMap {
-//        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
-//            .catch { e -> e.printStackTrace() }
-//            .asLiveData()
-//    }
-
-
     private val _photo = MutableLiveData(noPhoto)
     val photo: LiveData<PhotoModel>
         get() = _photo
 
-//    var selectedId = 0L
-    var selectedPost: Post? = null
+    val selectedPost = MutableStateFlow<Post?>(null)
 
     init {
         loadPosts()
@@ -121,7 +100,6 @@ class PostViewModel (
         }
     }
 
-
     fun save() {
         edited.value?.let {
             _postCreated.value = Unit
@@ -130,7 +108,7 @@ class PostViewModel (
                     val id = repository.saveWork(
                         it, _photo.value?.uri?.let { MediaUpload(it.toFile()) }
                     )
-                    val data = workDataOf(SavePostWorker.postKey to id)
+                    val data = workDataOf(SavePostWorker.POST_KEY to id)
                     val constraints = Constraints.Builder()
                         .setRequiredNetworkType(NetworkType.CONNECTED)
                         .build()
@@ -180,7 +158,7 @@ class PostViewModel (
             try {
                 _dataState.value = FeedModelState(loading = true)
 
-                val data = workDataOf(RemovePostWorker.postKey to id)
+                val data = workDataOf(RemovePostWorker.POST_KEY to id)
                 val constraints = Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
                     .build()
