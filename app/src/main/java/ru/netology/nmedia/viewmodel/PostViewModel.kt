@@ -108,7 +108,7 @@ class PostViewModel @Inject constructor(
                     val id = repository.saveWork(
                         it, _photo.value?.uri?.let { MediaUpload(it.toFile()) }
                     )
-                    val data = workDataOf(SavePostWorker.postKey to id)
+                    val data = workDataOf(SavePostWorker.POST_KEY to id)
                     val constraints = Constraints.Builder()
                         .setRequiredNetworkType(NetworkType.CONNECTED)
                         .build()
@@ -158,7 +158,7 @@ class PostViewModel @Inject constructor(
             try {
                 _dataState.value = FeedModelState(loading = true)
 
-                val data = workDataOf(RemovePostWorker.postKey to id)
+                val data = workDataOf(RemovePostWorker.POST_KEY to id)
                 val constraints = Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
                     .build()

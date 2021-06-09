@@ -16,7 +16,6 @@ import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.auth.AuthState
 import ru.netology.nmedia.dto.PushToken
 
-private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
 
 interface PostsApiService {
     @POST("users/push-tokens")
@@ -69,18 +68,4 @@ interface PostsApiService {
     @GET("posts/latest")
     suspend fun getLatest(@Query("count") count: Int): Response<List<Post>>
 }
-
-fun okhttp(vararg interceptors: Interceptor): OkHttpClient = OkHttpClient.Builder()
-    .apply {
-        interceptors.forEach {
-            this.addInterceptor(it)
-        }
-    }
-    .build()
-
-fun retrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
-    .addConverterFactory(GsonConverterFactory.create())
-    .baseUrl(BASE_URL)
-    .client(client)
-    .build()
 

@@ -41,7 +41,7 @@ class NMediaApplication : Application() {
                 .setConstraints(constraints)
                 .build()
             workManager.enqueueUniquePeriodicWork(
-                RefreshPostsWorker.name,
+                RefreshPostsWorker.NAME,
                 ExistingPeriodicWorkPolicy.KEEP,
                 request
             )
