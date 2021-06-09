@@ -85,7 +85,7 @@ class PostRemoteMediator(
                         )
                     }
                 }
-                postDao.insert(body.toEntity())
+                postDao.insert(body.toEntity(false))
             }
             return MediatorResult.Success(endOfPaginationReached = body.isEmpty())
         } catch (e: Exception) {

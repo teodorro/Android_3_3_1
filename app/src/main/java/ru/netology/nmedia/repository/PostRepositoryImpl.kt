@@ -39,9 +39,9 @@ class PostRepositoryImpl @Inject constructor(
     private val postDao: PostDao,
     private val postWorkDao: PostWorkDao,
     appDb: AppDb,
-    private val postDao: PostDao,
+//    private val postDao: PostDao,
     postRemoteKeyDao: PostRemoteKeyDao,
-    private val postWorkDao: PostWorkDao,
+//    private val postWorkDao: PostWorkDao,
     private val apiService: PostsApiService,
 ) : PostRepository {
 
