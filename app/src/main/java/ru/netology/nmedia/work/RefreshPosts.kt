@@ -31,20 +31,20 @@ class RefreshPostsWorker(
             Result.retry()
         }
     }
-}
 
-@Singleton
-class RefreshPostsWorkerFactory @Inject constructor(
-    private val repository: PostRepository,
-) : WorkerFactory() {
-    override fun createWorker(
-        appContext: Context,
-        workerClassName: String,
-        workerParameters: WorkerParameters
-    ): ListenableWorker? = when (workerClassName) {
-        RefreshPostsWorker::class.java.name ->
-            RefreshPostsWorker(appContext, workerParameters, repository)
-        else ->
-            null
+    @Singleton
+    class Factory @Inject constructor(
+        private val repository: PostRepository,
+    ) : WorkerFactory() {
+        override fun createWorker(
+            appContext: Context,
+            workerClassName: String,
+            workerParameters: WorkerParameters
+        ): ListenableWorker? = when (workerClassName) {
+            RefreshPostsWorker::class.java.name ->
+                RefreshPostsWorker(appContext, workerParameters, repository)
+            else ->
+                null
+        }
     }
 }

@@ -10,8 +10,8 @@ class DependencyWorkerFactory @Inject constructor(
     repository: PostRepository,
 ) : DelegatingWorkerFactory() {
     init {
-        addFactory(RefreshPostsWorkerFactory(repository))
-        addFactory(SavePostWorkerFactory(repository))
-        addFactory(RemovePostWorkerFactory(repository))
+        addFactory(RefreshPostsWorker.Factory(repository))
+        addFactory(SavePostWorker.Factory(repository))
+        addFactory(RemovePostWorker.Factory(repository))
     }
 }

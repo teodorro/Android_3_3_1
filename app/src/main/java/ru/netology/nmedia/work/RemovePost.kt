@@ -30,20 +30,20 @@ class RemovePostWorker(
             Result.retry()
         }
     }
-}
 
-@Singleton
-class RemovePostWorkerFactory @Inject constructor(
-    private val repository: PostRepository,
-) : WorkerFactory() {
-    override fun createWorker(
-        appContext: Context,
-        workerClassName: String,
-        workerParameters: WorkerParameters
-    ): ListenableWorker? = when (workerClassName) {
-        RemovePostWorker::class.java.name ->
-            RemovePostWorker(appContext, workerParameters, repository)
-        else ->
-            null
+    @Singleton
+    class Factory @Inject constructor(
+        private val repository: PostRepository,
+    ) : WorkerFactory() {
+        override fun createWorker(
+            appContext: Context,
+            workerClassName: String,
+            workerParameters: WorkerParameters
+        ): ListenableWorker? = when (workerClassName) {
+            RemovePostWorker::class.java.name ->
+                RemovePostWorker(appContext, workerParameters, repository)
+            else ->
+                null
+        }
     }
 }
