@@ -58,6 +58,14 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             invalidateOptionsMenu()
         }
 
+        viewModel.moveToAuthEvent.observe(this) {
+            viewModel.moveToAuth(this)
+        }
+
+        viewModel.signOutEvent.observe(this) {
+            viewModel.signOut()
+        }
+
         firebaseMessaging.token.addOnCompleteListener { task ->
             if (!task.isSuccessful)
                 Log.d(null, "some stuff happened: ${task.exception}")
@@ -80,14 +88,14 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.signin -> {
-                findNavController(R.id.nav_host_fragment).navigate(R.id.action_feedFragment_to_signInFragment)
+                viewModel.moveToAuthInvoke()
                 true
             }
             R.id.signup -> {
                 true
             }
             R.id.signout -> {
-                appAuth.removeAuth()
+                viewModel.signOutInvoke()
                 true
             }
             else -> super.onOptionsItemSelected(item)
