@@ -2,24 +2,34 @@ package ru.netology.nmedia.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.viewmodel.PostViewModel
+import ru.netology.nmedia.viewmodel.AuthViewModel
+import javax.inject.Inject
 
+
+@AndroidEntryPoint
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
-    private val viewModel: PostViewModel by viewModels()
+    @Inject
+    lateinit var appAuth: AppAuth
+    @Inject
+    lateinit var firebaseMessaging: FirebaseMessaging
+    @Inject
+    lateinit var googleApiAvailability: GoogleApiAvailability
+
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,36 +54,48 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                 )
         }
 
-        lifecycleScope
-
-        checkGoogleApiAvailability()
-
-        viewModel.data.observe(this){
+        viewModel.data.observe(this) {
             invalidateOptionsMenu()
         }
+
+        viewModel.moveToAuthEvent.observe(this) {
+            viewModel.moveToAuth(this)
+        }
+
+        viewModel.signOutEvent.observe(this) {
+            viewModel.signOut()
+        }
+
+        firebaseMessaging.token.addOnCompleteListener { task ->
+            if (!task.isSuccessful)
+                Log.d(null, "some stuff happened: ${task.exception}")
+            val token = task.result
+            Log.d(null, token)
+        }
+
+        checkGoogleApiAvailability()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-        var authenticated = AppAuth.getInstance().authStateFlow.value.id != 0L
-        menu?.let{
-            it.setGroupVisible(R.id.unauthenticated, !authenticated)
-            it.setGroupVisible(R.id.authenticated, authenticated)
+        menu?.let {
+            it.setGroupVisible(R.id.unauthenticated, !viewModel.authenticated)
+            it.setGroupVisible(R.id.authenticated, viewModel.authenticated)
         }
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId){
+        return when (item.itemId) {
             R.id.signin -> {
-                findNavController(R.id.nav_host_fragment).navigate(R.id.action_feedFragment_to_signInFragment)
+                viewModel.moveToAuthInvoke()
                 true
             }
             R.id.signup -> {
                 true
             }
             R.id.signout -> {
-                AppAuth.getInstance().removeAuth()
+                viewModel.signOutInvoke()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -81,7 +103,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     }
 
     private fun checkGoogleApiAvailability() {
-        with(GoogleApiAvailability.getInstance()) {
+        with(googleApiAvailability) {
             val code = isGooglePlayServicesAvailable(this@AppActivity)
             if (code == ConnectionResult.SUCCESS) {
                 return@with
@@ -92,10 +114,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             }
             Toast.makeText(this@AppActivity, R.string.google_play_unavailable, Toast.LENGTH_LONG)
                 .show()
-        }
-
-        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
-            println(it.token)
         }
     }
 }

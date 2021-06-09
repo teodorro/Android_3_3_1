@@ -8,17 +8,18 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentSigninBinding
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.viewmodel.AuthViewModel
 
+@AndroidEntryPoint
 class AuthFragment : Fragment() {
 
     private val viewModel: AuthViewModel by viewModels(
-        ownerProducer = ::requireParentFragment
+        ownerProducer = ::requireParentFragment,
     )
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,18 +41,17 @@ class AuthFragment : Fragment() {
                     Toast.makeText(this.context, e.message, Toast.LENGTH_LONG)
                         .show()
                 }
-            } else{
+            } else {
                 Toast.makeText(this.context, R.string.enterLoginPassword, Toast.LENGTH_LONG)
                     .show()
             }
         }
 
-        viewModel.data.observe(viewLifecycleOwner){
+        viewModel.data.observe(viewLifecycleOwner) {
             if (viewModel.authenticated) {
                 AndroidUtils.hideKeyboard(requireView())
                 findNavController().navigateUp()
-            }
-            else{
+            } else {
                 if (binding.editTextLogin.text.toString().isNotBlank())
                     Toast.makeText(this.context, R.string.errorLoginPassword, Toast.LENGTH_LONG)
                         .show()

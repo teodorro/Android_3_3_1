@@ -1,9 +1,13 @@
 package ru.netology.nmedia.repository
 
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.lifecycle.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -27,21 +31,26 @@ import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PostRepositoryImpl(
+@Singleton
+class PostRepositoryImpl @Inject constructor(
     private val postDao: PostDao,
-    private val postWorkDao: PostWorkDao
+    private val postWorkDao: PostWorkDao,
+    private val apiService: PostsApiService,
 ) : PostRepository {
 
-    override val data = postDao.getAll()
-        .map(List<PostEntity>::toDto)
-        .flowOn(Dispatchers.Default)
+    override val data: Flow<PagingData<Post>> = Pager(
+        config = PagingConfig(pageSize = 5, enablePlaceholders = false),
+        pagingSourceFactory = { PostPagingSource(apiService) },
+    ).flow
 
     override fun getNewerCount(id: Long): Flow<Int> = flow {
         while (true) {
             delay(5_000)
 
-            val response = PostsApi.service.getNewer(id)
+            val response = apiService.getNewer(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -55,7 +64,7 @@ class PostRepositoryImpl(
     override suspend fun getAll() {
         try {
             // получить все посты с сервера
-            val response = PostsApi.service.getAll()
+            val response = apiService.getAll()
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -72,7 +81,7 @@ class PostRepositoryImpl(
 
     override suspend fun save(post: Post) {
         try {
-            val response = PostsApi.service.save(post)
+            val response = apiService.save(post)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -88,7 +97,7 @@ class PostRepositoryImpl(
 
     override suspend fun removeById(id: Long) {
         try {
-            val response = PostsApi.service.removeById(id)
+            val response = apiService.removeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -103,14 +112,14 @@ class PostRepositoryImpl(
 
     override suspend fun likeById(id: Long) {
         try {
-            val postResponse = PostsApi.service.getById(id)
+            val postResponse = apiService.getById(id)
             val postBody =
                 postResponse.body() ?: throw ApiError(postResponse.code(), postResponse.message())
 
             val response: Response<Post> = if (!postBody.likedByMe) {
-                PostsApi.service.likeById(id)
+                apiService.likeById(id)
             } else {
-                PostsApi.service.dislikeById(id)
+                apiService.dislikeById(id)
             }
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
@@ -155,7 +164,7 @@ class PostRepositoryImpl(
                 "file", upload.file.name, upload.file.asRequestBody()
             )
 
-            val response = PostsApi.service.upload(media)
+            val response = apiService.upload(media)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -183,7 +192,6 @@ class PostRepositoryImpl(
 
     override suspend fun processWork(id: Long) {
         try {// TODO: handle this in homework
-
             val entity = postWorkDao.getById(id)
             var post = entity.toDto()
             if (entity.uri != null) {
@@ -193,8 +201,8 @@ class PostRepositoryImpl(
             }
             save(post)
 
-            println(entity.id)
-            println(post.id)
+            Log.d(null, entity.id.toString())
+            Log.d(null, post.id.toString())
         } catch (e: Exception) {
             throw UnknownError
         }
@@ -202,7 +210,7 @@ class PostRepositoryImpl(
 
     override suspend fun removeWork(id: Long) {
         try {
-            val response = PostsApi.service.removeById(id)
+            val response = apiService.removeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
