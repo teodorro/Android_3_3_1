@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import androidx.paging.map
 import androidx.work.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -50,14 +51,27 @@ class PostViewModel @Inject constructor(
     appAuth: AppAuth
 ) : ViewModel() {
 
+    private val cached = repository
+        .data
+        .cachedIn(viewModelScope)
+
     val data: Flow<PagingData<Post>> = appAuth.authStateFlow
         .flatMapLatest { (myId, _) ->
-            repository.data.map { pagingData ->
+            cached.map { pagingData ->
                 pagingData.map { post ->
                     post.copy(ownedByMe = post.authorId == myId)
                 }
             }
         }
+
+//    val data: Flow<PagingData<Post>> = appAuth.authStateFlow
+//        .flatMapLatest { (myId, _) ->
+//            repository.data.map { pagingData ->
+//                pagingData.map { post ->
+//                    post.copy(ownedByMe = post.authorId == myId)
+//                }
+//            }
+//        }
 
     private val _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
