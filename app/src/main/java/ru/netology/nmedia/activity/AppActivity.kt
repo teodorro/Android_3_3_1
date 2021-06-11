@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -59,7 +60,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
         }
 
         viewModel.moveToAuthEvent.observe(this) {
-            viewModel.moveToAuth(this)
+            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.action_feedFragment_to_signInFragment)
         }
 
         viewModel.signOutEvent.observe(this) {

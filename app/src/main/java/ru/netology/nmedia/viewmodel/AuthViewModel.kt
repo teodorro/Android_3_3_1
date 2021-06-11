@@ -54,10 +54,6 @@ class AuthViewModel @Inject constructor(
         _signOutEvent.value = Unit
     }
 
-    fun moveToAuth(activity: Activity){
-        findNavController(activity, R.id.nav_host_fragment).navigate(R.id.action_feedFragment_to_signInFragment)
-    }
-
     fun signOut(){
         auth.removeAuth()
     }
