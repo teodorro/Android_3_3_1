@@ -36,4 +36,5 @@
     <string name="login2">Войти</string>
     <string name="errorLoginPassword">Неверный логин или пароль. Или другая ошибка</string>
     <string name="enterLoginPassword">Введите логин и пароль</string>
+    <string name="ad_description">Реклама</string>
 </resources>

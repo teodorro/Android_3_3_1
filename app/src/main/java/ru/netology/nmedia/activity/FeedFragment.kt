@@ -11,18 +11,28 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
-import ru.netology.nmedia.adapter.OnInteractionListener
-import ru.netology.nmedia.adapter.PostsAdapter
+import ru.netology.nmedia.adapter.*
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.viewmodel.PostViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
+    @Inject
+    lateinit var repository: PostRepository
+
+    @Inject
+    lateinit var auth: AppAuth
+
     private var newPostsWasPressed: Boolean = false
 
     private val viewModel: PostViewModel by viewModels(
@@ -36,7 +46,7 @@ class FeedFragment : Fragment() {
     ): View {
         val binding = FragmentFeedBinding.inflate(inflater, container, false)
 
-        val adapter = PostsAdapter(object : OnInteractionListener {
+        val adapter = FeedAdapter(object : FeedAdapter.OnInteractionListener {
             override fun onEdit(post: Post) {
                 viewModel.edit(post)
             }
@@ -66,26 +76,66 @@ class FeedFragment : Fragment() {
                 findNavController().navigate(R.id.action_feedFragment_to_picFragment)
             }
         })
-        binding.recyclerView.adapter = adapter
 
-        viewModel.dataState.observe(viewLifecycleOwner, { state ->
-            binding.progress.isVisible = state.loading
-            binding.swiperefresh.isRefreshing = state.refreshing
-            if (state.error) {
-                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.retry_loading) { viewModel.loadPosts() }
-                    .show()
+        val progressAdapterListener = object: ProgressAdapter.OnInteractionListener{
+            override fun onRetry() {
+                adapter.retry()
             }
-        })
+        }
+
+        binding.recyclerView.adapter = adapter.withLoadStateHeaderAndFooter(
+            header = ProgressAdapter(progressAdapterListener),
+            footer = ProgressAdapter(progressAdapterListener),
+        )
+
+//        binding.recyclerView.adapter = adapter.withLoadStateHeaderAndFooter(
+//            header = PagingLoadStateAdapter(object : PagingLoadStateAdapter.OnInteractionListener {
+//                override fun onRetry() {
+//                    adapter.retry()
+//                }
+//            }),
+//            footer = PagingLoadStateAdapter(object : PagingLoadStateAdapter.OnInteractionListener {
+//                override fun onRetry() {
+//                    adapter.retry()
+//                }
+//            }),
+//        )
+
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            0, ItemTouchHelper.START or ItemTouchHelper.END
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            override fun onSwiped(
+                viewHolder: RecyclerView.ViewHolder,
+                direction: Int
+            ) {
+                println("DO SOMETHING")
+            }
+        }).attachToRecyclerView(binding.recyclerView)
+
+//        binding.recyclerView.adapter = adapter
+//
+//        viewModel.dataState.observe(viewLifecycleOwner, { state ->
+//            binding.progress.isVisible = state.loading
+//            binding.swiperefresh.isRefreshing = state.refreshing
+//            if (state.error) {
+//                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+//                    .setAction(R.string.retry_loading) { viewModel.loadPosts() }
+//                    .show()
+//            }
+//        })
 
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()
             adapter.refresh()
             viewModel.updateWasSeen()
-        }
-
-        binding.fab.setOnClickListener {
-            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
         }
 
         binding.fabNewPosts.setOnClickListener {
@@ -109,6 +159,10 @@ class FeedFragment : Fragment() {
         }
 
         binding.swiperefresh.setOnRefreshListener(adapter::refresh)
+
+        binding.fab.setOnClickListener {
+            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+        }
 
         return binding.root
     }
