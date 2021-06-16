@@ -35,4 +35,5 @@
     <string name="login2">Log in</string>
     <string name="errorLoginPassword">Wrong login or password. Or some other error</string>
     <string name="enterLoginPassword">Please enter login and password</string>
+    <string name="ad_description">ad</string>
 </resources>

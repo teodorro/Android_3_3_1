@@ -1,34 +1,60 @@
 package ru.netology.nmedia.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import android.app.Activity
+import androidx.lifecycle.*
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.findNavController
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import ru.netology.nmedia.api.PostsApi
+import ru.netology.nmedia.R
+import ru.netology.nmedia.api.PostsApiService
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.auth.AuthState
 import ru.netology.nmedia.error.ApiError
+import ru.netology.nmedia.util.SingleLiveEvent
+import javax.inject.Inject
 
-class AuthViewModel(application: Application) : AndroidViewModel(application)  {
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val auth: AppAuth,
+    private val apiService: PostsApiService
+    ) : ViewModel() {
 
-    val data: LiveData<AuthState> = AppAuth.getInstance()
-        .authStateFlow
+    val data: LiveData<AuthState> = auth.authStateFlow
         .asLiveData(Dispatchers.Default)
     val authenticated: Boolean
-        get() = AppAuth.getInstance().authStateFlow.value.id != 0L
+        get() = auth.authStateFlow.value.id != 0L
+
+    private val _moveToAuthEvent = SingleLiveEvent<Unit>()
+    val moveToAuthEvent: LiveData<Unit>
+        get() = _moveToAuthEvent
+
+    private val _signOutEvent = SingleLiveEvent<Unit>()
+    val signOutEvent: LiveData<Unit>
+        get() = _signOutEvent
 
     fun signIn(login: String, password: String) = viewModelScope.launch {
-            val response = PostsApi.service.signIn(login, password)
+        val response = apiService.signIn(login, password)
 
-            if (!response.isSuccessful) {
-                AppAuth.getInstance().setAuth(0, "")
-                return@launch
-            }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            AppAuth.getInstance().setAuth(body.id, body.token ?: "")
+        if (!response.isSuccessful) {
+            auth.setAuth(0, "")
+            return@launch
+        }
+        val body = response.body() ?: throw ApiError(response.code(), response.message())
+        auth.setAuth(body.id, body.token ?: "")
+    }
+
+    fun moveToAuthInvoke(){
+        _moveToAuthEvent.value = Unit
+    }
+
+    fun signOutInvoke(){
+        _signOutEvent.value = Unit
+    }
+
+    fun signOut(){
+        auth.removeAuth()
     }
 }
