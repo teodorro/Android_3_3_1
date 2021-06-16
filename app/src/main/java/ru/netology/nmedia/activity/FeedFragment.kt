@@ -88,19 +88,6 @@ class FeedFragment : Fragment() {
             footer = ProgressAdapter(progressAdapterListener),
         )
 
-//        binding.recyclerView.adapter = adapter.withLoadStateHeaderAndFooter(
-//            header = PagingLoadStateAdapter(object : PagingLoadStateAdapter.OnInteractionListener {
-//                override fun onRetry() {
-//                    adapter.retry()
-//                }
-//            }),
-//            footer = PagingLoadStateAdapter(object : PagingLoadStateAdapter.OnInteractionListener {
-//                override fun onRetry() {
-//                    adapter.retry()
-//                }
-//            }),
-//        )
-
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             0, ItemTouchHelper.START or ItemTouchHelper.END
         ) {
@@ -119,18 +106,6 @@ class FeedFragment : Fragment() {
                 println("DO SOMETHING")
             }
         }).attachToRecyclerView(binding.recyclerView)
-
-//        binding.recyclerView.adapter = adapter
-//
-//        viewModel.dataState.observe(viewLifecycleOwner, { state ->
-//            binding.progress.isVisible = state.loading
-//            binding.swiperefresh.isRefreshing = state.refreshing
-//            if (state.error) {
-//                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
-//                    .setAction(R.string.retry_loading) { viewModel.loadPosts() }
-//                    .show()
-//            }
-//        })
 
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()
@@ -152,13 +127,9 @@ class FeedFragment : Fragment() {
         lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest { state ->
                 binding.swiperefresh.isRefreshing =
-                    state.refresh is LoadState.Loading ||
-                            state.prepend is LoadState.Loading ||
-                            state.append is LoadState.Loading
+                    state.refresh is LoadState.Loading
             }
         }
-
-        binding.swiperefresh.setOnRefreshListener(adapter::refresh)
 
         binding.fab.setOnClickListener {
             findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
